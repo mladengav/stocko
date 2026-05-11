@@ -1,0 +1,6 @@
+@StockoApi_HostAddress = http://localhost:5195
+
+GET {{StockoApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
