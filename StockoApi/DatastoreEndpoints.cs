@@ -4,7 +4,9 @@
     {
         public static void MapDatastoreEndpoints(this IEndpointRouteBuilder app)
         {
-            app.MapGet("overview", async (IDatastoreService datastoreService) =>
+            var group = app.MapGroup("/datastore").WithTags("Datastore");
+
+            group.MapGet("overview", async (IDatastoreService datastoreService) =>
             {
                 var tickers = await datastoreService.GetOverviewAsync();
 
