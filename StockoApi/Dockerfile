@@ -9,10 +9,18 @@ EXPOSE 8081
 
 
 # This stage is used to build the service project
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS with-node
+RUN apt-get update
+RUN apt-get install curl
+RUN curl -sL https://deb.nodesource.com/setup_24.x | bash
+RUN apt-get -y install nodejs
+
+
+FROM with-node AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["StockoApi/StockoApi.csproj", "StockoApi/"]
+COPY ["stockoui/stockoui.esproj", "stockoui/"]
 RUN dotnet restore "./StockoApi/StockoApi.csproj"
 COPY . .
 WORKDIR "/src/StockoApi"

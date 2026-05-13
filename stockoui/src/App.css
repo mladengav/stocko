@@ -1,0 +1,54 @@
+﻿#root {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+th, td {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.app-shell {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 1.5rem;
+    text-align: left;
+}
+
+.app-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 160px;
+    padding: 1rem 0.5rem;
+    border-right: 1px solid var(--border, #e5e4e7);
+}
+
+.app-nav button {
+    background: transparent;
+    border: 1px solid transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.app-nav button:hover {
+    background: var(--accent-bg, rgba(170, 59, 255, 0.1));
+}
+
+.app-nav button.active {
+    background: var(--accent-bg, rgba(170, 59, 255, 0.1));
+    border-color: var(--accent-border, rgba(170, 59, 255, 0.5));
+    color: var(--text-h, #08060d);
+}
+
+.app-content {
+    flex: 1;
+    min-width: 0;
+}

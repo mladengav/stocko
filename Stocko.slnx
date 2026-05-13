@@ -1,3 +1,9 @@
 <Solution>
-  <Project Path="StockoApi/StockoApi.csproj" />
+  <Project Path="StockoApi/StockoApi.csproj">
+    <BuildDependency Project="stockoui/stockoui.esproj" />
+  </Project>
+  <Project Path="stockoui/stockoui.esproj">
+    <Build />
+    <Deploy />
+  </Project>
 </Solution>
