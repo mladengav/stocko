@@ -1,10 +1,29 @@
 import { useEffect, useMemo, useState } from 'react';
 import { currencyFormatter } from '../lib/format';
+import PortfolioAllocations from './PortfolioAllocations';
 import type { Position, TickerOverview } from './types';
 
 const reportPositions: Position[] = [
-    { symbol: 'BNS.TO', quantity: 100 },
-    { symbol: 'TD.TO', quantity: 50 },
+    { symbol: "BCE.TO", quantity: 45 },
+    { symbol: "CAS.TO", quantity: 223 },
+    { symbol: "CGO.TO", quantity: 290 },
+    { symbol: "CM.TO", quantity: 25 },
+    { symbol: "CNQ.TO", quantity: 307 },
+    { symbol: "CPX.TO", quantity: 124 },
+    { symbol: "CTC-A.TO", quantity: 11 },
+    { symbol: "CU.TO", quantity: 633 },
+    { symbol: "CVE.TO", quantity: 81 },
+    { symbol: "EMA.TO", quantity: 55 },
+    { symbol: "ENB.TO", quantity: 345 },
+    { symbol: "ENGH.TO", quantity: 343 },
+    { symbol: "FTS.TO", quantity: 59 },
+    { symbol: "PPL.TO", quantity: 100 },
+    { symbol: "SLF.TO", quantity: 94 },
+    { symbol: "SOBO.TO", quantity: 94 },
+    { symbol: "T.TO", quantity: 250 },
+    { symbol: "TD.TO", quantity: 24 },
+    { symbol: "TRP.TO", quantity: 184 },
+    { symbol: "WTE.TO", quantity: 102 }
 ];
 
 function ClientSideReportView() {
@@ -46,38 +65,7 @@ function ClientSideReportView() {
         );
     }, [rows]);
 
-    const allocations = useMemo(() => {
-        if (rows === undefined || portfolioTotals === undefined || portfolioTotals.value === 0) return undefined;
-        const bySector = new Map<string, { value: number; industries: Map<string, number> }>();
-        for (const row of rows) {
-            const sectorKey = row.ticker.sectorKey;
-            const industryKey = row.ticker.industryKey;
-            let sector = bySector.get(sectorKey);
-            if (sector === undefined) {
-                sector = { value: 0, industries: new Map() };
-                bySector.set(sectorKey, sector);
-            }
-            sector.value += row.positionValue;
-            sector.industries.set(
-                industryKey,
-                (sector.industries.get(industryKey) ?? 0) + row.positionValue,
-            );
-        }
-        return Array.from(bySector, ([sectorKey, sector]) => ({
-            key: sectorKey,
-            allocation: sector.value / portfolioTotals.value,
-            industries: Array.from(sector.industries, ([industryKey, value]) => ({
-                key: industryKey,
-                allocation: value / portfolioTotals.value,
-            })),
-        }));
-    }, [rows, portfolioTotals]);
-
-    const totalIndustryRows = allocations === undefined
-        ? 0
-        : allocations.reduce((sum, s) => sum + s.industries.length, 0);
-
-    const contents = rows === undefined || portfolioTotals === undefined || allocations === undefined
+    const contents = rows === undefined || portfolioTotals === undefined || portfolioTotals.value === 0
         ? <p><em>Loading...</em></p>
         : <>
             <table className="table table-striped" aria-label="Portfolio Totals">
@@ -98,36 +86,11 @@ function ClientSideReportView() {
                     </tr>
                 </tbody>
             </table>
-            <table className="table table-striped" aria-label="Portfolio Allocations">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Sector</th>
-                        <th>Allocation</th>
-                        <th>Industry</th>
-                        <th>Allocation</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {allocations.flatMap((sector, sectorIdx) =>
-                        sector.industries.map((industry, industryIdx) => (
-                            <tr key={`${sector.key}|${industry.key}`}>
-                                {sectorIdx === 0 && industryIdx === 0 && (
-                                    <th scope="row" rowSpan={totalIndustryRows}>Portfolio Allocations</th>
-                                )}
-                                {industryIdx === 0 && (
-                                    <>
-                                        <td rowSpan={sector.industries.length}>{sector.key}</td>
-                                        <td rowSpan={sector.industries.length}>{(sector.allocation * 100).toFixed(2)}%</td>
-                                    </>
-                                )}
-                                <td>{industry.key}</td>
-                                <td>{(industry.allocation * 100).toFixed(2)}%</td>
-                            </tr>
-                        ))
-                    )}
-                </tbody>
-            </table>
+            <PortfolioAllocations
+                rows={rows}
+                portfolioValue={portfolioTotals.value}
+                portfolioFwdDividend={portfolioTotals.fwdDividend}
+            />
             <table className="table table-striped" aria-labelledby="clientSideReportTableLabel">
             <thead>
                 <tr>
