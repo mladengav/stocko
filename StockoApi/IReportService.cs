@@ -7,7 +7,7 @@
 
     public record Position(string Symbol, int Quantity);
 
-    public record PositionOverviewRecord(Position Position, decimal TtmDivs, decimal LastDiv);
+    public record PositionOverviewRecord(Position Position, decimal TtmDivs);
 
     public class ReportService(IDatastoreService dataStore) : IReportService
     {
@@ -26,14 +26,14 @@
                 }
                 else 
                 {
-                    yield return new PositionOverviewRecord(pos, 0m, 0m);
+                    yield return new PositionOverviewRecord(pos, 0m);
                 }
             }
         }
 
         private static PositionOverviewRecord AggregatePosition(Position position, TickerOverviewRecord ticker)
         {
-            return new PositionOverviewRecord(position, ticker.TtmDivs * position.Quantity, ticker.LastDiv * position.Quantity);
+            return new PositionOverviewRecord(position, ticker.TtmDivs * position.Quantity);
         }
     }   
 }
