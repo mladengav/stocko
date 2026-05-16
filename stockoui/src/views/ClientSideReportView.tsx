@@ -4,26 +4,25 @@ import PortfolioAllocations from './PortfolioAllocations';
 import type { Position, TickerOverview } from './types';
 
 const reportPositions: Position[] = [
-    { symbol: "BCE.TO", quantity: 45 },
-    { symbol: "CAS.TO", quantity: 220 },
-    { symbol: "CGO.TO", quantity: 250 },
-    { symbol: "CM.TO", quantity: 25 },
-    { symbol: "CNQ.TO", quantity: 300 },
-    { symbol: "CPX.TO", quantity: 120 },
+    { symbol: "BCE.TO", quantity: 50 },
+    { symbol: "CAS.TO", quantity: 100 },
+    { symbol: "CGO.TO", quantity: 125 },
+    { symbol: "CM.TO", quantity: 20 },
+    { symbol: "CNQ.TO", quantity: 100 },
+    { symbol: "CPX.TO", quantity: 100 },
     { symbol: "CTC-A.TO", quantity: 10 },
-    { symbol: "CU.TO", quantity: 650 },
+    { symbol: "CU.TO", quantity: 300 },
     { symbol: "CVE.TO", quantity: 80 },
-    { symbol: "EMA.TO", quantity: 55 },
-    { symbol: "ENB.TO", quantity: 350 },
-    { symbol: "ENGH.TO", quantity: 300 },
-    { symbol: "FTS.TO", quantity: 60 },
-    { symbol: "PPL.TO", quantity: 100 },
+    { symbol: "EMA.TO", quantity: 50 },
+    { symbol: "ENB.TO", quantity: 190 },
+    { symbol: "FTS.TO", quantity: 50 },
+    { symbol: "PPL.TO", quantity: 50 },
     { symbol: "SLF.TO", quantity: 90 },
-    { symbol: "SOBO.TO", quantity: 100 },
-    { symbol: "T.TO", quantity: 250 },
-    { symbol: "TD.TO", quantity: 25 },
-    { symbol: "TRP.TO", quantity: 200 },
-    { symbol: "WTE.TO", quantity: 100 }
+    { symbol: "SOBO.TO", quantity: 50 },
+    { symbol: "T.TO", quantity: 100 },
+    { symbol: "TD.TO", quantity: 20 },
+    { symbol: "TRP.TO", quantity: 100 },
+    { symbol: "WTE.TO", quantity: 90 }
 ];
 
 function ClientSideReportView() {
