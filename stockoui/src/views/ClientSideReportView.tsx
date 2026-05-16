@@ -1,29 +1,29 @@
 import { useEffect, useMemo, useState } from 'react';
-import { currencyFormatter } from '../lib/format';
+import { currencyFormatter, formatMarketCap } from '../lib/format';
 import PortfolioAllocations from './PortfolioAllocations';
 import type { Position, TickerOverview } from './types';
 
 const reportPositions: Position[] = [
     { symbol: "BCE.TO", quantity: 45 },
-    { symbol: "CAS.TO", quantity: 223 },
-    { symbol: "CGO.TO", quantity: 290 },
+    { symbol: "CAS.TO", quantity: 220 },
+    { symbol: "CGO.TO", quantity: 250 },
     { symbol: "CM.TO", quantity: 25 },
-    { symbol: "CNQ.TO", quantity: 307 },
-    { symbol: "CPX.TO", quantity: 124 },
-    { symbol: "CTC-A.TO", quantity: 11 },
-    { symbol: "CU.TO", quantity: 633 },
-    { symbol: "CVE.TO", quantity: 81 },
+    { symbol: "CNQ.TO", quantity: 300 },
+    { symbol: "CPX.TO", quantity: 120 },
+    { symbol: "CTC-A.TO", quantity: 10 },
+    { symbol: "CU.TO", quantity: 650 },
+    { symbol: "CVE.TO", quantity: 80 },
     { symbol: "EMA.TO", quantity: 55 },
-    { symbol: "ENB.TO", quantity: 345 },
-    { symbol: "ENGH.TO", quantity: 343 },
-    { symbol: "FTS.TO", quantity: 59 },
+    { symbol: "ENB.TO", quantity: 350 },
+    { symbol: "ENGH.TO", quantity: 300 },
+    { symbol: "FTS.TO", quantity: 60 },
     { symbol: "PPL.TO", quantity: 100 },
-    { symbol: "SLF.TO", quantity: 94 },
-    { symbol: "SOBO.TO", quantity: 94 },
+    { symbol: "SLF.TO", quantity: 90 },
+    { symbol: "SOBO.TO", quantity: 100 },
     { symbol: "T.TO", quantity: 250 },
-    { symbol: "TD.TO", quantity: 24 },
-    { symbol: "TRP.TO", quantity: 184 },
-    { symbol: "WTE.TO", quantity: 102 }
+    { symbol: "TD.TO", quantity: 25 },
+    { symbol: "TRP.TO", quantity: 200 },
+    { symbol: "WTE.TO", quantity: 100 }
 ];
 
 function ClientSideReportView() {
@@ -96,20 +96,21 @@ function ClientSideReportView() {
                 <tr>
                     <th>Symbol</th>
                     <th>Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Position Value</th>
+                    <th>Div Rate</th>
+                    <th>Position FwdDividend</th>
+                    <th>TtmDivs</th>
+                    <th>Position TtmDividend</th>
                     <th>Sector</th>
                     <th>Industry</th>
                     <th>Snapshot</th>
                     <th>Ex-Div</th>
-                    <th>Price</th>
                     <th>Div Rate</th>
                     <th>Div Yield</th>
                     <th>Market Cap</th>
                     <th>Payout Ratio</th>
-                    <th>TtmDivs</th>
-                    <th>Quantity</th>
-                    <th>Position Value</th>
-                    <th>Position FwdDividend</th>
-                    <th>Position TtmDividend</th>
                 </tr>
             </thead>
             <tbody>
@@ -117,20 +118,21 @@ function ClientSideReportView() {
                     <tr key={row.ticker.symbol}>
                         <td>{row.ticker.symbol}</td>
                         <td>{row.ticker.longName}</td>
+                        <td>{currencyFormatter.format(row.ticker.currentPrice)}</td>
+                        <td>{row.quantity}</td>
+                        <td>{currencyFormatter.format(row.positionValue)}</td>
+                        <td>{currencyFormatter.format(row.ticker.dividendRate)}</td>
+                        <td>{currencyFormatter.format(row.positionFwdDividend)}</td>
+                        <td>{currencyFormatter.format(row.ticker.ttmDivs)}</td>
+                        <td>{currencyFormatter.format(row.positionTtmDividend)}</td>
                         <td>{row.ticker.sectorKey}</td>
                         <td>{row.ticker.industryKey}</td>
                         <td>{row.ticker.snapshotDate}</td>
                         <td>{row.ticker.exDividendDateUtc}</td>
-                        <td>{currencyFormatter.format(row.ticker.currentPrice)}</td>
                         <td>{currencyFormatter.format(row.ticker.dividendRate)}</td>
-                        <td>{(row.ticker.dividendYield * 100).toFixed(2)}%</td>
-                        <td>{currencyFormatter.format(row.ticker.marketCap)}</td>
+                        <td>{(row.ticker.dividendYield).toFixed(2)}%</td>
+                        <td>{formatMarketCap(row.ticker.marketCap)}</td>
                         <td>{(row.ticker.payoutRatio * 100).toFixed(2)}%</td>
-                        <td>{currencyFormatter.format(row.ticker.ttmDivs)}</td>
-                        <td>{row.quantity}</td>
-                        <td>{currencyFormatter.format(row.positionValue)}</td>
-                        <td>{currencyFormatter.format(row.positionFwdDividend)}</td>
-                        <td>{currencyFormatter.format(row.positionTtmDividend)}</td>
                     </tr>
                 )}
             </tbody>
