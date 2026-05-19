@@ -1,41 +1,21 @@
 import { useEffect, useMemo, useState } from 'react';
 import { currencyFormatter, formatMarketCap } from '../lib/format';
 import PortfolioAllocations from './PortfolioAllocations';
+import ReportInput from './ReportInput';
 import type { Position, TickerOverview } from './types';
 
-const reportPositions: Position[] = [
-    { symbol: "BCE.TO", quantity: 50 },
-    { symbol: "CAS.TO", quantity: 100 },
-    { symbol: "CGO.TO", quantity: 125 },
-    { symbol: "CM.TO", quantity: 20 },
-    { symbol: "CNQ.TO", quantity: 100 },
-    { symbol: "CPX.TO", quantity: 100 },
-    { symbol: "CTC-A.TO", quantity: 10 },
-    { symbol: "CU.TO", quantity: 300 },
-    { symbol: "CVE.TO", quantity: 80 },
-    { symbol: "EMA.TO", quantity: 50 },
-    { symbol: "ENB.TO", quantity: 190 },
-    { symbol: "FTS.TO", quantity: 50 },
-    { symbol: "PPL.TO", quantity: 50 },
-    { symbol: "SLF.TO", quantity: 90 },
-    { symbol: "SOBO.TO", quantity: 50 },
-    { symbol: "T.TO", quantity: 100 },
-    { symbol: "TD.TO", quantity: 20 },
-    { symbol: "TRP.TO", quantity: 100 },
-    { symbol: "WTE.TO", quantity: 90 }
-];
-
 function ClientSideReportView() {
+    const [reportPositions, setReportPositions] = useState<Position[]>();
     const [tickers, setTickers] = useState<TickerOverview[]>();
 
     useEffect(() => {
-        if (tickers === undefined) {
+        if (reportPositions !== undefined && tickers === undefined) {
             populateDatastoreData();
         }
-    }, [tickers]);
+    }, [reportPositions, tickers]);
 
     const rows = useMemo(() => {
-        if (tickers === undefined) return undefined;
+        if (tickers === undefined || reportPositions === undefined) return undefined;
         const bySymbol = new Map(tickers.map(t => [t.symbol, t]));
         return reportPositions
             .map(p => {
@@ -50,7 +30,21 @@ function ClientSideReportView() {
                 };
             })
             .filter((r): r is NonNullable<typeof r> => r !== undefined);
-    }, [tickers]);
+    }, [tickers, reportPositions]);
+
+    const ignoredSymbols = useMemo(() => {
+        if (reportPositions === undefined || tickers === undefined) return [];
+        const supported = new Set(tickers.map(t => t.symbol));
+        const ignored: string[] = [];
+        const seen = new Set<string>();
+        for (const { symbol } of reportPositions) {
+            if (!supported.has(symbol) && !seen.has(symbol)) {
+                seen.add(symbol);
+                ignored.push(symbol);
+            }
+        }
+        return ignored;
+    }, [reportPositions, tickers]);
 
     const portfolioTotals = useMemo(() => {
         if (rows === undefined) return undefined;
@@ -64,9 +58,32 @@ function ClientSideReportView() {
         );
     }, [rows]);
 
-    const contents = rows === undefined || portfolioTotals === undefined || portfolioTotals.value === 0
+
+    //TODO:  Move to MUI datagrid:  https://mui.com/x/react-data-grid/
+    const reportContents = tickers === undefined
+        ? <p><em>Loading...</em></p>
+        : rows === undefined || rows.length === 0
+        ? <>
+            {ignoredSymbols.length > 0 && (
+                <p>
+                    <em>
+                        NOTE:  Some symbols from the input are not currently supported and have been ignored ({ignoredSymbols.join(',')})
+                    </em>
+                </p>
+            )}
+            <p><em>No positions matched symbols in the datastore. Check CSV symbols (e.g. BCE.TO).</em></p>
+        </>
+        : portfolioTotals === undefined
         ? <p><em>Loading...</em></p>
         : <>
+            <ReportInput onPositionsLoaded={setReportPositions} />
+            {ignoredSymbols.length > 0 && (
+                <p>
+                    <em>
+                        NOTE:  Some symbols from the input are not currently supported and have been ignored ({ignoredSymbols.join(',')})
+                    </em>
+                </p>
+            )}
             <table className="table table-striped" aria-label="Portfolio Totals">
                 <thead>
                     <tr>
@@ -141,7 +158,9 @@ function ClientSideReportView() {
     return (
         <div className="client-side-report-view">
             <h1 id="clientSideReportTableLabel">Client-Side Report</h1>
-            {contents}
+            {reportPositions === undefined
+                ? <ReportInput onPositionsLoaded={setReportPositions} />
+                : reportContents}
         </div>
     );
 

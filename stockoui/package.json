@@ -15,7 +15,8 @@
     "@mui/material": "^9.0.1",
     "@mui/x-charts": "^9.2.0",
     "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "react-dom": "^19.2.6",
+    "react-papaparse": "^4.4.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
