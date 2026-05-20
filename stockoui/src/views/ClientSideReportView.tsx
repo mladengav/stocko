@@ -131,6 +131,9 @@ function ClientSideReportView() {
                     <th>% Insiders</th>
                     <th>% Institutions</th>
                     <th>Type</th>
+                    <th>Last Div Decrease</th>
+                    <th>Years Since Decrease</th>
+                    <th>Years Consecutive Increase</th>
                 </tr>
             </thead>
             <tbody>
@@ -157,6 +160,9 @@ function ClientSideReportView() {
                         <td>{formatFractionAsPercent(row.ticker.heldPercentInsiders)}</td>
                         <td>{formatFractionAsPercent(row.ticker.heldPercentInstitutions)}</td>
                         <td>{row.ticker.typeDisp}</td>
+                        <td>{row.ticker.lastDividendDecrease}</td>
+                        <td>{row.ticker.yearsSinceDividendDecrease}</td>
+                        <td>{row.ticker.yearsConsecutiveDividendIncrease}</td>
                     </tr>
                 )}
             </tbody>

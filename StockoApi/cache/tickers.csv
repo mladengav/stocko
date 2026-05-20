@@ -1,6 +1,5 @@
 snapshotDate,symbol,sectorKey,industryKey,industry,sector,exDividendDate,lastDividendDate,longName,regularMarketPrice,regularMarketTime,dividendRate,dividendYield,marketCap,payoutRatio,heldPercentInsiders,heldPercentInstitutions,quoteType,typeDisp
 2026-05-19,TD.TO,financial-services,banks-diversified,Banks - Diversified,Financial Services,1775692800,1775692800,The Toronto-Dominion Bank,148.38,1779220800,4.32,2.91,248800067584,0.3425,0.00044,0.55098,EQUITY,Equity
-2026-05-19,BNS.TO,financial-services,banks-diversified,Banks - Diversified,Financial Services,1775520000,1775520000,The Bank of Nova Scotia,106.33,1779220800,4.4,4.14,130938339328,0.6469,0.00021,0.50928,EQUITY,Equity
 2026-05-19,BCE.TO,communication-services,telecom-services,Telecom Services,Communication Services,1781481600,1773619200,BCE Inc.,32.98,1779220800,1.75,5.35,30754701312,0.2585,0.00031,0.49567002,EQUITY,Equity
 2026-05-20,CM.TO,financial-services,banks-diversified,Banks - Diversified,Financial Services,1774569600,1774569600,Canadian Imperial Bank of Commerce,154.42,1779220800,4.28,2.77,142120452096,0.415,0.00022,0.53187,EQUITY,Equity
 2026-05-20,WTE.TO,industrials,marine-shipping,Marine Shipping,Industrials,1782777600,1774915200,Westshore Terminals Investment Corporation,40.0,1779220800,1.5,3.75,2470790656,0.94339997,0.47654998,0.098000005,EQUITY,Equity

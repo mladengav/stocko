@@ -18,6 +18,9 @@ export interface TickerOverview {
     heldPercentInstitutions: number;
     quoteType: string;
     typeDisp: string;
+    lastDividendDecrease: string;
+    yearsSinceDividendDecrease: number;
+    yearsConsecutiveDividendIncrease: number;
     ttmDivs: number;
 }
 

@@ -32,6 +32,9 @@ function DatastoreView() {
                     <th>% Insiders</th>
                     <th>% Institutions</th>
                     <th>Type</th>
+                    <th>Last Div Decrease</th>
+                    <th>Years Since Decrease</th>
+                    <th>Years Consecutive Increase</th>
                     <th>TtmDivs</th>
                 </tr>
             </thead>
@@ -54,6 +57,9 @@ function DatastoreView() {
                         <td>{formatFractionAsPercent(ticker.heldPercentInsiders)}</td>
                         <td>{formatFractionAsPercent(ticker.heldPercentInstitutions)}</td>
                         <td>{ticker.typeDisp}</td>
+                        <td>{ticker.lastDividendDecrease}</td>
+                        <td>{ticker.yearsSinceDividendDecrease}</td>
+                        <td>{ticker.yearsConsecutiveDividendIncrease}</td>
                         <td>{currencyFormatter.format(ticker.ttmDivs)}</td>
                     </tr>
                 )}

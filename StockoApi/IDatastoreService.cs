@@ -25,6 +25,9 @@
         double HeldPercentInstitutions,
         string QuoteType,
         string TypeDisp,
+        DateOnly LastDividendDecrease,
+        int YearsSinceDividendDecrease,
+        int YearsConsecutiveDividendIncrease,
         decimal TtmDivs);
 
     public class TestDatastoreService : IDatastoreService
@@ -53,6 +56,9 @@
                     HeldPercentInstitutions: 0.50928,
                     QuoteType: "EQUITY",
                     TypeDisp: "Equity",
+                    LastDividendDecrease: new DateOnly(2008, 3, 4),
+                    YearsSinceDividendDecrease: 18,
+                    YearsConsecutiveDividendIncrease: 12,
                     TtmDivs: 0.88m),
                 new(
                     SnapshotDate: new DateOnly(2026, 5, 19),
@@ -74,6 +80,9 @@
                     HeldPercentInstitutions: 0.55098,
                     QuoteType: "EQUITY",
                     TypeDisp: "Equity",
+                    LastDividendDecrease: new DateOnly(1995, 3, 10),
+                    YearsSinceDividendDecrease: 31,
+                    YearsConsecutiveDividendIncrease: 16,
                     TtmDivs: 1.56m)
             };
 
