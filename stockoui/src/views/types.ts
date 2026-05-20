@@ -29,6 +29,14 @@ export interface Position {
     quantity: number;
 }
 
+export interface ReportRow {
+    ticker: TickerOverview;
+    quantity: number;
+    positionValue: number;
+    positionFwdDividend: number;
+    positionTtmDividend: number;
+}
+
 export interface PositionOverview {
     position: Position;
     ttmDivs: number;

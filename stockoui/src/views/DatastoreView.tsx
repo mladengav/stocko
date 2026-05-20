@@ -3,12 +3,9 @@ import {
     MaterialReactTable,
     useMaterialReactTable,
     type MRT_ColumnDef,
-    MRT_GlobalFilterTextField,
-    MRT_ToggleFiltersButton,
 } from 'material-react-table';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { Box, alpha, lighten, type Theme } from '@mui/material';
 import {
     currencyFormatter,
     formatEpochSeconds,
@@ -16,118 +13,46 @@ import {
     formatIndustryLabel,
     formatMarketCap,
 } from '../lib/format';
+import {
+    calculatedKpisHeaderCellProps,
+    calculatedKpisHeaderShade,
+    getDefaultMrtTableOptions,
+    leftAlignedCellProps,
+    symbolBodyCellProps,
+    TableColumnLegend,
+    tickerDataHeaderCellProps,
+    tickerDataHeaderShade,
+} from '../lib/mrtTableStyle';
 import type { TickerOverview } from './types';
-
-const leftAlignedCellProps: Pick<MRT_ColumnDef<TickerOverview>, 'muiTableBodyCellProps'> = {
-    muiTableBodyCellProps: { align: 'left' },
-};
-
-const tickerDataHeaderShade = (theme: Theme) =>
-    theme.palette.mode === 'dark'
-        ? alpha(theme.palette.info.light, 0.14)
-        : alpha(theme.palette.info.main, 0.1);
-
-const calculatedKpisHeaderShade = (theme: Theme) =>
-    theme.palette.mode === 'dark'
-        ? alpha(theme.palette.success.light, 0.18)
-        : alpha(theme.palette.success.main, 0.12);
-
-const shadedHeaderCellProps = (
-    backgroundColor: (theme: Theme) => string,
-): Pick<MRT_ColumnDef<TickerOverview>, 'muiTableHeadCellProps'> => ({
-    muiTableHeadCellProps: {
-        align: 'center',
-        sx: (theme) => ({
-            verticalAlign: 'middle',
-            backgroundColor: backgroundColor(theme),
-            '& .Mui-TableHeadCell-Content': {
-                alignItems: 'center',
-                justifyContent: 'center',
-            },
-        }),
-    },
-});
-
-const tickerDataHeaderCellProps = shadedHeaderCellProps(tickerDataHeaderShade);
-const calculatedKpisHeaderCellProps = shadedHeaderCellProps(calculatedKpisHeaderShade);
-
-function DatastoreLegend() {
-    return (
-        <Box
-            component="table"
-            sx={{ borderCollapse: 'collapse', mb: 1, width: 'auto' }}
-        >
-            <Box component="tbody">
-                <Box component="tr">
-                    <Box component="td" sx={{ border: 'none', fontWeight: 'bold', pr: 2.5, whiteSpace: 'nowrap' }}>
-                        Legend:
-                    </Box>
-                    <Box
-                        aria-hidden
-                        component="td"
-                        sx={(theme) => ({
-                            backgroundColor: tickerDataHeaderShade(theme),
-                            border: `1px solid ${theme.palette.divider}`,
-                            height: 16,
-                            p: 0,
-                            width: 16,
-                        })}
-                    />
-                    <Box component="td" sx={{ border: 'none', pl: 1, pr: 1, whiteSpace: 'nowrap' }}>
-                        Direct Ticker Data
-                    </Box>
-                    <Box component="td" sx={{ border: 'none', width: 8 }} aria-hidden />
-                    <Box
-                        aria-hidden
-                        component="td"
-                        sx={(theme) => ({
-                            backgroundColor: calculatedKpisHeaderShade(theme),
-                            border: `1px solid ${theme.palette.divider}`,
-                            height: 16,
-                            p: 0,
-                            width: 16,
-                        })}
-                    />
-                    <Box component="td" sx={{ border: 'none', pl: 1, whiteSpace: 'nowrap' }}>
-                        Calculated KPI Values
-                    </Box>
-                </Box>
-            </Box>
-        </Box>
-    );
-}
 
 function DatastoreTable({ tickers }: { tickers: TickerOverview[] }) {
     const columns = useMemo<MRT_ColumnDef<TickerOverview>[]>(
         () => [
             {
-                ...tickerDataHeaderCellProps,
+                ...tickerDataHeaderCellProps<TickerOverview>(),
                 accessorKey: 'symbol',
                 header: 'Symbol',
-                muiTableBodyCellProps: {
-                    align: 'left',
-                    sx: { pl: 6 },
-                },
+                ...symbolBodyCellProps<TickerOverview>(),
                 size: 100,
             },
             {
-                ...tickerDataHeaderCellProps,
-                ...leftAlignedCellProps,
+                ...tickerDataHeaderCellProps<TickerOverview>(),
+                ...leftAlignedCellProps<TickerOverview>(),
                 accessorKey: 'longName',
                 header: 'Name',
                 size: 250,
             },
             {
-                ...tickerDataHeaderCellProps,
-                ...leftAlignedCellProps,
+                ...tickerDataHeaderCellProps<TickerOverview>(),
+                ...leftAlignedCellProps<TickerOverview>(),
                 accessorKey: 'sector',
                 filterVariant: 'autocomplete',
                 header: 'Sector',
                 size: 150,
             },
             {
-                ...tickerDataHeaderCellProps,
-                ...leftAlignedCellProps,
+                ...tickerDataHeaderCellProps<TickerOverview>(),
+                ...leftAlignedCellProps<TickerOverview>(),
                 accessorFn: (row) => formatIndustryLabel(row.sector, row.industry),
                 id: 'industry',
                 filterVariant: 'autocomplete',
@@ -135,25 +60,25 @@ function DatastoreTable({ tickers }: { tickers: TickerOverview[] }) {
                 size: 200,
             },
             {
-                ...tickerDataHeaderCellProps,
+                ...tickerDataHeaderCellProps<TickerOverview>(),
                 accessorKey: 'snapshotDate',
                 header: 'Snapshot',
                 size: 120,
             },
             {
-                ...tickerDataHeaderCellProps,
+                ...tickerDataHeaderCellProps<TickerOverview>(),
                 accessorKey: 'exDividendDate',
                 header: 'Ex-Div',
                 size: 120,
             },
             {
-                ...tickerDataHeaderCellProps,
+                ...tickerDataHeaderCellProps<TickerOverview>(),
                 accessorKey: 'lastDividendDate',
                 header: 'Last Div',
                 size: 120,
             },
             {
-                ...tickerDataHeaderCellProps,
+                ...tickerDataHeaderCellProps<TickerOverview>(),
                 accessorFn: (row) => row.regularMarketTime,
                 id: 'regularMarketTime',
                 header: 'Market Time',
@@ -161,7 +86,7 @@ function DatastoreTable({ tickers }: { tickers: TickerOverview[] }) {
                 Cell: ({ row }) => formatEpochSeconds(row.original.regularMarketTime),
             },
             {
-                ...tickerDataHeaderCellProps,
+                ...tickerDataHeaderCellProps<TickerOverview>(),
                 accessorKey: 'regularMarketPrice',
                 filterFn: 'between',
                 header: 'Price',
@@ -169,7 +94,7 @@ function DatastoreTable({ tickers }: { tickers: TickerOverview[] }) {
                 Cell: ({ cell }) => currencyFormatter.format(cell.getValue<number>()),
             },
             {
-                ...tickerDataHeaderCellProps,
+                ...tickerDataHeaderCellProps<TickerOverview>(),
                 accessorKey: 'dividendRate',
                 filterFn: 'between',
                 header: 'Div Rate',
@@ -177,7 +102,7 @@ function DatastoreTable({ tickers }: { tickers: TickerOverview[] }) {
                 Cell: ({ cell }) => currencyFormatter.format(cell.getValue<number>()),
             },
             {
-                ...tickerDataHeaderCellProps,
+                ...tickerDataHeaderCellProps<TickerOverview>(),
                 accessorKey: 'dividendYield',
                 filterFn: 'between',
                 header: 'Div Yield',
@@ -185,7 +110,7 @@ function DatastoreTable({ tickers }: { tickers: TickerOverview[] }) {
                 Cell: ({ cell }) => `${cell.getValue<number>().toFixed(2)}%`,
             },
             {
-                ...tickerDataHeaderCellProps,
+                ...tickerDataHeaderCellProps<TickerOverview>(),
                 accessorKey: 'marketCap',
                 filterFn: 'between',
                 header: 'Market Cap',
@@ -193,7 +118,7 @@ function DatastoreTable({ tickers }: { tickers: TickerOverview[] }) {
                 Cell: ({ cell }) => formatMarketCap(cell.getValue<number>()),
             },
             {
-                ...tickerDataHeaderCellProps,
+                ...tickerDataHeaderCellProps<TickerOverview>(),
                 accessorKey: 'payoutRatio',
                 filterFn: 'between',
                 header: 'Payout Ratio',
@@ -201,7 +126,7 @@ function DatastoreTable({ tickers }: { tickers: TickerOverview[] }) {
                 Cell: ({ cell }) => formatFractionAsPercent(cell.getValue<number>()),
             },
             {
-                ...tickerDataHeaderCellProps,
+                ...tickerDataHeaderCellProps<TickerOverview>(),
                 accessorKey: 'heldPercentInsiders',
                 filterFn: 'between',
                 header: '% Insiders',
@@ -209,7 +134,7 @@ function DatastoreTable({ tickers }: { tickers: TickerOverview[] }) {
                 Cell: ({ cell }) => formatFractionAsPercent(cell.getValue<number>()),
             },
             {
-                ...tickerDataHeaderCellProps,
+                ...tickerDataHeaderCellProps<TickerOverview>(),
                 accessorKey: 'heldPercentInstitutions',
                 filterFn: 'between',
                 header: '% Institutions',
@@ -217,34 +142,34 @@ function DatastoreTable({ tickers }: { tickers: TickerOverview[] }) {
                 Cell: ({ cell }) => formatFractionAsPercent(cell.getValue<number>()),
             },
             {
-                ...tickerDataHeaderCellProps,
+                ...tickerDataHeaderCellProps<TickerOverview>(),
                 accessorKey: 'typeDisp',
                 filterVariant: 'autocomplete',
                 header: 'Type',
                 size: 120,
             },
             {
-                ...calculatedKpisHeaderCellProps,
+                ...calculatedKpisHeaderCellProps<TickerOverview>(),
                 accessorKey: 'lastDividendDecrease',
                 header: 'Last Div Decrease',
                 size: 150,
             },
             {
-                ...calculatedKpisHeaderCellProps,
+                ...calculatedKpisHeaderCellProps<TickerOverview>(),
                 accessorKey: 'yearsSinceDividendDecrease',
                 filterFn: 'between',
                 header: 'Years Since Div. Decr.',
                 size: 170,
             },
             {
-                ...calculatedKpisHeaderCellProps,
+                ...calculatedKpisHeaderCellProps<TickerOverview>(),
                 accessorKey: 'yearsConsecutiveDividendIncrease',
                 filterFn: 'between',
                 header: 'Years Cons. Div. Increase',
                 size: 200,
             },
             {
-                ...calculatedKpisHeaderCellProps,
+                ...calculatedKpisHeaderCellProps<TickerOverview>(),
                 accessorKey: 'ttmDivs',
                 filterFn: 'between',
                 header: 'TTM Dividends',
@@ -258,64 +183,17 @@ function DatastoreTable({ tickers }: { tickers: TickerOverview[] }) {
     const table = useMaterialReactTable({
         columns,
         data: tickers,
-        enableColumnFilterModes: true,
-        enableFacetedValues: true,
-        initialState: {
-            showColumnFilters: false,
-            showGlobalFilter: true,
-        },
-        muiSearchTextFieldProps: {
-            size: 'small',
-            variant: 'outlined',
-        },
-        muiPaginationProps: {
-            color: 'secondary',
-            rowsPerPageOptions: [10, 20, 30, 50],
-            shape: 'rounded',
-            variant: 'outlined',
-        },
-        paginationDisplayMode: 'pages',
-        muiTableProps: {
-            sx: (theme) => ({
-                '& .MuiTableCell-root': {
-                    borderRight: `1px solid ${theme.palette.divider}`,
-                },
-                '& .MuiTableCell-root:first-of-type': {
-                    borderLeft: `1px solid ${theme.palette.divider}`,
-                },
-            }),
-        },
-        muiTableHeadCellProps: {
-            align: 'center',
-            sx: {
-                verticalAlign: 'middle',
-                '& .Mui-TableHeadCell-Content': {
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                },
-            },
-        },
-        muiTableBodyCellProps: {
-            align: 'center',
-        },
-        renderTopToolbar: ({ table }) => (
-            <Box
-                sx={(theme) => ({
-                    backgroundColor: lighten(theme.palette.background.default, 0.05),
-                    display: 'flex',
-                    gap: '0.5rem',
-                    p: '8px',
-                })}
-            >
-                <MRT_GlobalFilterTextField table={table} />
-                <MRT_ToggleFiltersButton table={table} />
-            </Box>
-        ),
+        ...getDefaultMrtTableOptions<TickerOverview>(),
     });
 
     return (
         <>
-            <DatastoreLegend />
+            <TableColumnLegend
+                items={[
+                    { shade: tickerDataHeaderShade, label: 'Direct Ticker Data' },
+                    { shade: calculatedKpisHeaderShade, label: 'Calculated KPI Values' },
+                ]}
+            />
             <MaterialReactTable table={table} />
         </>
     );
@@ -339,7 +217,7 @@ function DatastoreView() {
         );
 
     return (
-        <div>
+        <div className="datastore-view">
             <h1 id="datastoreTableLabel">Datastore Overview</h1>
             {contents}
         </div>
