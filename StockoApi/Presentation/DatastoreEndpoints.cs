@@ -1,4 +1,6 @@
-﻿namespace StockoApi
+﻿using StockoApi.Application;
+
+namespace StockoApi.Presentation
 {
     public static class DatastoreEndpoints
     {
@@ -9,8 +11,6 @@
             group.MapGet("overview", async (IDatastoreService datastoreService) =>
             {
                 var tickers = await datastoreService.GetOverviewAsync();
-
-
 
                 return TypedResults.Json(tickers, statusCode: StatusCodes.Status200OK);
             })

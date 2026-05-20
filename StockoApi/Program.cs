@@ -1,5 +1,9 @@
 
 using Scalar.AspNetCore;
+using StockoApi.Application;
+using StockoApi.Infrastructure.Datastore;
+using StockoApi.Infrastructure.Report;
+using StockoApi.Presentation;
 
 namespace StockoApi
 {
@@ -15,7 +19,7 @@ namespace StockoApi
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
-            builder.Services.AddSingleton<IDatastoreService, CsvDatastoreService>();
+            builder.Services.AddSingleton<IDatastoreService, AzBlobCsvDatastoreService>();
             builder.Services.AddScoped<IReportService, ReportService>();
 
             var app = builder.Build();

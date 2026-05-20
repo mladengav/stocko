@@ -1,4 +1,6 @@
-﻿namespace StockoApi
+﻿using StockoApi.Application;
+
+namespace StockoApi.Presentation
 {
     public static class ReportEndpoints
     {
@@ -9,8 +11,6 @@
             reporting.MapPost("aggregate-positions", async (List<Position> positions, IReportService reportService) =>
             {
                 var aggregatedPositions = await reportService.CreatePositionReportAsync(positions).ToListAsync();
-
-
 
                 return TypedResults.Json(aggregatedPositions, statusCode: StatusCodes.Status200OK);
             })

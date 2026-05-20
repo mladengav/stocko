@@ -2,8 +2,9 @@ using Azure.Core;
 using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using StockoApi.Application;
 
-namespace StockoApi
+namespace StockoApi.Infrastructure.Datastore
 {
     /// <summary>
     /// A <see cref="CsvDatastoreService"/> that mirrors a "csvcache" Azure Blob

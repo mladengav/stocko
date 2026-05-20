@@ -2,10 +2,11 @@ using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
+using StockoApi.Application;
 
-namespace StockoApi
+namespace StockoApi.Infrastructure.Datastore
 {
-    public class CsvDatastoreService : IDatastoreService
+    public class CsvDatastoreService(string cacheFolder) : IDatastoreService
     {
         private const string TickersFileName = "tickers.csv";
         private const string AggregationsSubdir = "aggregations";
@@ -14,18 +15,13 @@ namespace StockoApi
         private const string YearsSinceDividendDecreaseFileName = "years_since_dividend_decrease.csv";
         private const string YearsConsecutiveDividendIncreaseFileName = "years_consecutive_dividend_increase.csv";
 
-        private readonly string _cacheFolder;
+        private readonly string _cacheFolder = cacheFolder;
 
         protected string CacheFolder => _cacheFolder;
 
         public CsvDatastoreService(IWebHostEnvironment env)
             : this(ResolveCacheFolder(env.ContentRootPath))
         {
-        }
-
-        public CsvDatastoreService(string cacheFolder)
-        {
-            _cacheFolder = cacheFolder;
         }
 
         public virtual async Task<IEnumerable<TickerOverviewRecord>> GetOverviewAsync()

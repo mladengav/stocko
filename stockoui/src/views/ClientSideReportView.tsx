@@ -1,8 +1,258 @@
 import { useEffect, useMemo, useState } from 'react';
-import { currencyFormatter, formatEpochSeconds, formatFractionAsPercent, formatIndustryLabel, formatMarketCap } from '../lib/format';
+import {
+    MaterialReactTable,
+    useMaterialReactTable,
+    type MRT_ColumnDef,
+} from 'material-react-table';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import {
+    currencyFormatter,
+    formatEpochSeconds,
+    formatFractionAsPercent,
+    formatIndustryLabel,
+    formatMarketCap,
+} from '../lib/format';
+import {
+    calculatedKpisHeaderCellProps,
+    calculatedKpisHeaderShade,
+    getDefaultMrtTableOptions,
+    leftAlignedCellProps,
+    portfolioTotalsHeaderCellProps,
+    portfolioTotalsHeaderShade,
+    symbolBodyCellProps,
+    TableColumnLegend,
+    tickerDataHeaderCellProps,
+    tickerDataHeaderShade,
+} from '../lib/mrtTableStyle';
 import PortfolioAllocations from './PortfolioAllocations';
 import ReportInput from './ReportInput';
-import type { Position, TickerOverview } from './types';
+import type { Position, ReportRow, TickerOverview } from './types';
+
+function ClientSideReportTable({ rows }: { rows: ReportRow[] }) {
+    const columns = useMemo<MRT_ColumnDef<ReportRow>[]>(
+        () => [
+            {
+                ...tickerDataHeaderCellProps<ReportRow>(),
+                accessorFn: (row) => row.ticker.symbol,
+                id: 'symbol',
+                header: 'Symbol',
+                ...symbolBodyCellProps<ReportRow>(),
+                size: 100,
+            },
+            {
+                ...tickerDataHeaderCellProps<ReportRow>(),
+                ...leftAlignedCellProps<ReportRow>(),
+                accessorFn: (row) => row.ticker.longName,
+                id: 'longName',
+                header: 'Name',
+                size: 250,
+            },
+            {
+                ...tickerDataHeaderCellProps<ReportRow>(),
+                accessorFn: (row) => row.ticker.regularMarketPrice,
+                id: 'regularMarketPrice',
+                filterFn: 'between',
+                header: 'Price',
+                size: 100,
+                Cell: ({ cell }) => currencyFormatter.format(cell.getValue<number>()),
+            },
+            {
+                ...portfolioTotalsHeaderCellProps<ReportRow>(),
+                accessorKey: 'quantity',
+                filterFn: 'between',
+                header: 'Quantity',
+                size: 100,
+            },
+            {
+                ...portfolioTotalsHeaderCellProps<ReportRow>(),
+                accessorKey: 'positionValue',
+                filterFn: 'between',
+                header: 'Position Value',
+                size: 120,
+                Cell: ({ cell }) => currencyFormatter.format(cell.getValue<number>()),
+            },
+            {
+                ...tickerDataHeaderCellProps<ReportRow>(),
+                accessorFn: (row) => row.ticker.dividendRate,
+                id: 'dividendRate',
+                filterFn: 'between',
+                header: 'Div Rate',
+                size: 100,
+                Cell: ({ cell }) => currencyFormatter.format(cell.getValue<number>()),
+            },
+            {
+                ...portfolioTotalsHeaderCellProps<ReportRow>(),
+                accessorKey: 'positionFwdDividend',
+                filterFn: 'between',
+                header: 'Position FwdDividend',
+                size: 150,
+                Cell: ({ cell }) => currencyFormatter.format(cell.getValue<number>()),
+            },
+            {
+                ...calculatedKpisHeaderCellProps<ReportRow>(),
+                accessorFn: (row) => row.ticker.ttmDivs,
+                id: 'ttmDivs',
+                filterFn: 'between',
+                header: 'TtmDivs',
+                size: 100,
+                Cell: ({ cell }) => currencyFormatter.format(cell.getValue<number>()),
+            },
+            {
+                ...portfolioTotalsHeaderCellProps<ReportRow>(),
+                accessorKey: 'positionTtmDividend',
+                filterFn: 'between',
+                header: 'Position TtmDividend',
+                size: 150,
+                Cell: ({ cell }) => currencyFormatter.format(cell.getValue<number>()),
+            },
+            {
+                ...tickerDataHeaderCellProps<ReportRow>(),
+                ...leftAlignedCellProps<ReportRow>(),
+                accessorFn: (row) => row.ticker.sector,
+                filterVariant: 'autocomplete',
+                id: 'sector',
+                header: 'Sector',
+                size: 150,
+            },
+            {
+                ...tickerDataHeaderCellProps<ReportRow>(),
+                ...leftAlignedCellProps<ReportRow>(),
+                accessorFn: (row) => formatIndustryLabel(row.ticker.sector, row.ticker.industry),
+                filterVariant: 'autocomplete',
+                id: 'industry',
+                header: 'Industry',
+                size: 200,
+            },
+            {
+                ...tickerDataHeaderCellProps<ReportRow>(),
+                accessorFn: (row) => row.ticker.snapshotDate,
+                id: 'snapshotDate',
+                header: 'Snapshot',
+                size: 120,
+            },
+            {
+                ...tickerDataHeaderCellProps<ReportRow>(),
+                accessorFn: (row) => row.ticker.exDividendDate,
+                id: 'exDividendDate',
+                header: 'Ex-Div',
+                size: 120,
+            },
+            {
+                ...tickerDataHeaderCellProps<ReportRow>(),
+                accessorFn: (row) => row.ticker.lastDividendDate,
+                id: 'lastDividendDate',
+                header: 'Last Div',
+                size: 120,
+            },
+            {
+                ...tickerDataHeaderCellProps<ReportRow>(),
+                accessorFn: (row) => row.ticker.regularMarketTime,
+                id: 'regularMarketTime',
+                header: 'Market Time',
+                size: 180,
+                Cell: ({ row }) => formatEpochSeconds(row.original.ticker.regularMarketTime),
+            },
+            {
+                ...tickerDataHeaderCellProps<ReportRow>(),
+                accessorFn: (row) => row.ticker.dividendYield,
+                id: 'dividendYield',
+                filterFn: 'between',
+                header: 'Div Yield',
+                size: 100,
+                Cell: ({ cell }) => `${cell.getValue<number>().toFixed(2)}%`,
+            },
+            {
+                ...tickerDataHeaderCellProps<ReportRow>(),
+                accessorFn: (row) => row.ticker.marketCap,
+                id: 'marketCap',
+                filterFn: 'between',
+                header: 'Market Cap',
+                size: 120,
+                Cell: ({ cell }) => formatMarketCap(cell.getValue<number>()),
+            },
+            {
+                ...tickerDataHeaderCellProps<ReportRow>(),
+                accessorFn: (row) => row.ticker.payoutRatio,
+                id: 'payoutRatio',
+                filterFn: 'between',
+                header: 'Payout Ratio',
+                size: 120,
+                Cell: ({ cell }) => formatFractionAsPercent(cell.getValue<number>()),
+            },
+            {
+                ...tickerDataHeaderCellProps<ReportRow>(),
+                accessorFn: (row) => row.ticker.heldPercentInsiders,
+                id: 'heldPercentInsiders',
+                filterFn: 'between',
+                header: '% Insiders',
+                size: 120,
+                Cell: ({ cell }) => formatFractionAsPercent(cell.getValue<number>()),
+            },
+            {
+                ...tickerDataHeaderCellProps<ReportRow>(),
+                accessorFn: (row) => row.ticker.heldPercentInstitutions,
+                id: 'heldPercentInstitutions',
+                filterFn: 'between',
+                header: '% Institutions',
+                size: 130,
+                Cell: ({ cell }) => formatFractionAsPercent(cell.getValue<number>()),
+            },
+            {
+                ...tickerDataHeaderCellProps<ReportRow>(),
+                accessorFn: (row) => row.ticker.typeDisp,
+                filterVariant: 'autocomplete',
+                id: 'typeDisp',
+                header: 'Type',
+                size: 120,
+            },
+            {
+                ...calculatedKpisHeaderCellProps<ReportRow>(),
+                accessorFn: (row) => row.ticker.lastDividendDecrease,
+                id: 'lastDividendDecrease',
+                header: 'Last Div Decrease',
+                size: 150,
+            },
+            {
+                ...calculatedKpisHeaderCellProps<ReportRow>(),
+                accessorFn: (row) => row.ticker.yearsSinceDividendDecrease,
+                filterFn: 'between',
+                id: 'yearsSinceDividendDecrease',
+                header: 'Years Since Decrease',
+                size: 170,
+            },
+            {
+                ...calculatedKpisHeaderCellProps<ReportRow>(),
+                accessorFn: (row) => row.ticker.yearsConsecutiveDividendIncrease,
+                filterFn: 'between',
+                id: 'yearsConsecutiveDividendIncrease',
+                header: 'Years Consecutive Increase',
+                size: 200,
+            },
+        ],
+        [],
+    );
+
+    const table = useMaterialReactTable({
+        columns,
+        data: rows,
+        getRowId: (row) => row.ticker.symbol,
+        ...getDefaultMrtTableOptions<ReportRow>(),
+    });
+
+    return (
+        <>
+            <TableColumnLegend
+                items={[
+                    { shade: tickerDataHeaderShade, label: 'Direct Ticker Data' },
+                    { shade: calculatedKpisHeaderShade, label: 'Calculated KPI Values' },
+                    { shade: portfolioTotalsHeaderShade, label: 'Portfolio Totals' },
+                ]}
+            />
+            <MaterialReactTable table={table} />
+        </>
+    );
+}
 
 function ClientSideReportView() {
     const [reportPositions, setReportPositions] = useState<Position[]>();
@@ -29,7 +279,7 @@ function ClientSideReportView() {
                     positionTtmDividend: ticker.ttmDivs * p.quantity,
                 };
             })
-            .filter((r): r is NonNullable<typeof r> => r !== undefined);
+            .filter((r): r is ReportRow => r !== undefined);
     }, [tickers, reportPositions]);
 
     const ignoredSymbols = useMemo(() => {
@@ -58,8 +308,6 @@ function ClientSideReportView() {
         );
     }, [rows]);
 
-
-    //TODO:  Move to MUI datagrid:  https://mui.com/x/react-data-grid/
     const reportContents = tickers === undefined
         ? <p><em>Loading...</em></p>
         : rows === undefined || rows.length === 0
@@ -107,66 +355,9 @@ function ClientSideReportView() {
                 portfolioValue={portfolioTotals.value}
                 portfolioFwdDividend={portfolioTotals.fwdDividend}
             />
-            <table className="table table-striped" aria-labelledby="clientSideReportTableLabel">
-            <thead>
-                <tr>
-                    <th>Symbol</th>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Position Value</th>
-                    <th>Div Rate</th>
-                    <th>Position FwdDividend</th>
-                    <th>TtmDivs</th>
-                    <th>Position TtmDividend</th>
-                    <th>Sector</th>
-                    <th>Industry</th>
-                    <th>Snapshot</th>
-                    <th>Ex-Div</th>
-                    <th>Last Div</th>
-                    <th>Market Time</th>
-                    <th>Div Yield</th>
-                    <th>Market Cap</th>
-                    <th>Payout Ratio</th>
-                    <th>% Insiders</th>
-                    <th>% Institutions</th>
-                    <th>Type</th>
-                    <th>Last Div Decrease</th>
-                    <th>Years Since Decrease</th>
-                    <th>Years Consecutive Increase</th>
-                </tr>
-            </thead>
-            <tbody>
-                {rows.map(row =>
-                    <tr key={row.ticker.symbol}>
-                        <td>{row.ticker.symbol}</td>
-                        <td>{row.ticker.longName}</td>
-                        <td>{currencyFormatter.format(row.ticker.regularMarketPrice)}</td>
-                        <td>{row.quantity}</td>
-                        <td>{currencyFormatter.format(row.positionValue)}</td>
-                        <td>{currencyFormatter.format(row.ticker.dividendRate)}</td>
-                        <td>{currencyFormatter.format(row.positionFwdDividend)}</td>
-                        <td>{currencyFormatter.format(row.ticker.ttmDivs)}</td>
-                        <td>{currencyFormatter.format(row.positionTtmDividend)}</td>
-                        <td>{row.ticker.sector}</td>
-                        <td>{formatIndustryLabel(row.ticker.sector, row.ticker.industry)}</td>
-                        <td>{row.ticker.snapshotDate}</td>
-                        <td>{row.ticker.exDividendDate}</td>
-                        <td>{row.ticker.lastDividendDate}</td>
-                        <td>{formatEpochSeconds(row.ticker.regularMarketTime)}</td>
-                        <td>{row.ticker.dividendYield.toFixed(2)}%</td>
-                        <td>{formatMarketCap(row.ticker.marketCap)}</td>
-                        <td>{formatFractionAsPercent(row.ticker.payoutRatio)}</td>
-                        <td>{formatFractionAsPercent(row.ticker.heldPercentInsiders)}</td>
-                        <td>{formatFractionAsPercent(row.ticker.heldPercentInstitutions)}</td>
-                        <td>{row.ticker.typeDisp}</td>
-                        <td>{row.ticker.lastDividendDecrease}</td>
-                        <td>{row.ticker.yearsSinceDividendDecrease}</td>
-                        <td>{row.ticker.yearsConsecutiveDividendIncrease}</td>
-                    </tr>
-                )}
-            </tbody>
-            </table>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <ClientSideReportTable rows={rows} />
+            </LocalizationProvider>
         </>;
 
     return (
