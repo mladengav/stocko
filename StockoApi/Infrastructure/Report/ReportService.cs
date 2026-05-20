@@ -1,14 +1,7 @@
-﻿namespace StockoApi
+﻿using StockoApi.Application;
+
+namespace StockoApi.Infrastructure.Report
 {
-    public interface IReportService
-    {
-        public IAsyncEnumerable<PositionOverviewRecord> CreatePositionReportAsync(IEnumerable<Position> positions);
-    }
-
-    public record Position(string Symbol, int Quantity);
-
-    public record PositionOverviewRecord(Position Position, decimal TtmDivs);
-
     public class ReportService(IDatastoreService dataStore) : IReportService
     {
         private readonly IDatastoreService DataStore = dataStore;
@@ -24,7 +17,7 @@
                 {
                     yield return AggregatePosition(pos, tor);
                 }
-                else 
+                else
                 {
                     yield return new PositionOverviewRecord(pos, 0m);
                 }
@@ -35,5 +28,5 @@
         {
             return new PositionOverviewRecord(position, ticker.TtmDivs * position.Quantity);
         }
-    }   
+    }
 }

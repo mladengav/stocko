@@ -1,5 +1,9 @@
 
 using Scalar.AspNetCore;
+using StockoApi.Application;
+using StockoApi.Infrastructure.Datastore;
+using StockoApi.Infrastructure.Report;
+using StockoApi.Presentation;
 
 namespace StockoApi
 {
