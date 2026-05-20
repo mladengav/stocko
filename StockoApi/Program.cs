@@ -19,7 +19,7 @@ namespace StockoApi
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
-            builder.Services.AddSingleton<IDatastoreService, CsvDatastoreService>();
+            builder.Services.AddSingleton<IDatastoreService, AzBlobCsvDatastoreService>();
             builder.Services.AddScoped<IReportService, ReportService>();
 
             var app = builder.Build();

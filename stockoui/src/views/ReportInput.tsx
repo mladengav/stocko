@@ -16,6 +16,25 @@ const REMOVE_HOVER_COLOR_LIGHT = lightenDarkenColor(
 );
 const GREY_DIM = '#686868';
 
+const SAMPLE_CSV = `"symbol","quantity"
+"TD.TO",34
+"ENB.TO",52
+"BNS.TO",99
+`;
+
+function downloadSampleCsv(event: MouseEvent) {
+    event.preventDefault();
+    const blob = new Blob([SAMPLE_CSV], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'sample-positions.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
 const styles = {
     zone: {
         alignItems: 'center',
@@ -241,7 +260,13 @@ function ReportInput({ onPositionsLoaded }: ReportInputProps) {
                     )}
                 </div>
             )}
-        </CSVReader>
+            </CSVReader>
+            <p style={{ fontSize: '0.85em', marginTop: 8, textAlign: "center" }}>
+            <a href="#" onClick={downloadSampleCsv}>
+                Download a sample CSV file
+            </a>
+            {' '}to start with
+        </p>
         </>
     );
 }
