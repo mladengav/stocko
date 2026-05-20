@@ -7,11 +7,11 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { styled } from '@mui/material/styles';
 import type { Theme } from '@mui/material/styles';
-import { currencyFormatter } from '../lib/format';
+import { currencyFormatter, formatIndustryLabel } from '../lib/format';
 
 interface PortfolioAllocationsProps {
     rows: ReadonlyArray<{
-        ticker: { sectorKey: string; industryKey: string };
+        ticker: { sector: string; industry: string };
         positionValue: number;
         positionFwdDividend: number;
     }>;
@@ -35,25 +35,25 @@ interface SectorAggregate {
 function aggregateRows(rows: PortfolioAllocationsProps['rows'], metric: keyof Pick<PortfolioAllocationsProps['rows'][number], 'positionValue' | 'positionFwdDividend'>): SectorAggregate[] {
     const bySector = new Map<string, { value: number; industries: Map<string, number> }>();
     for (const row of rows) {
-        const sectorKey = row.ticker.sectorKey;
-        const industryKey = row.ticker.industryKey;
+        const sector = row.ticker.sector;
+        const industry = row.ticker.industry;
         const weight = row[metric];
-        let sector = bySector.get(sectorKey);
-        if (sector === undefined) {
-            sector = { value: 0, industries: new Map() };
-            bySector.set(sectorKey, sector);
+        let sectorAggregate = bySector.get(sector);
+        if (sectorAggregate === undefined) {
+            sectorAggregate = { value: 0, industries: new Map() };
+            bySector.set(sector, sectorAggregate);
         }
-        sector.value += weight;
-        sector.industries.set(
-            industryKey,
-            (sector.industries.get(industryKey) ?? 0) + weight,
+        sectorAggregate.value += weight;
+        sectorAggregate.industries.set(
+            industry,
+            (sectorAggregate.industries.get(industry) ?? 0) + weight,
         );
     }
-    return Array.from(bySector, ([sectorKey, sector]) => ({
-        key: sectorKey,
-        value: sector.value,
-        industries: Array.from(sector.industries, ([industryKey, value]) => ({
-            key: industryKey,
+    return Array.from(bySector, ([sector, sectorAggregate]) => ({
+        key: sector,
+        value: sectorAggregate.value,
+        industries: Array.from(sectorAggregate.industries, ([industry, value]) => ({
+            key: industry,
             value,
         })),
     }));
@@ -160,15 +160,18 @@ function buildSectorSlices(allocations: SectorAggregate[]): SliceDatum[] {
 function buildIndustrySlices(allocations: SectorAggregate[]): SliceDatum[] {
     return allocations.flatMap((sector, sectorIdx) => {
         const count = sector.industries.length;
-        return sector.industries.map((industry, industryIdx) => ({
-            id: `${sector.key}|${industry.key}`,
-            label: (location: 'tooltip' | 'legend' | 'arc') =>
-                location === 'arc'
-                    ? industry.key
-                    : `${sector.key} - ${industry.key}`,
-            value: industry.value,
-            color: getIndustryColor(sectorIdx, industryIdx, count),
-        }));
+        return sector.industries.map((industry, industryIdx) => {
+            const industryLabel = formatIndustryLabel(sector.key, industry.key);
+            return {
+                id: `${sector.key}|${industry.key}`,
+                label: (location: 'tooltip' | 'legend' | 'arc') =>
+                    location === 'arc'
+                        ? industryLabel
+                        : `${sector.key} - ${industryLabel}`,
+                value: industry.value,
+                color: getIndustryColor(sectorIdx, industryIdx, count),
+            };
+        });
     });
 }
 
@@ -302,7 +305,7 @@ function PortfolioAllocations({ rows, portfolioValue, portfolioFwdDividend }: Po
                                         ) : null}
                                         <td>
                                             <ColorSwatchLabel color={industryColor}>
-                                                {industry.key}
+                                                {formatIndustryLabel(sector.key, industry.key)}
                                             </ColorSwatchLabel>
                                         </td>
                                         <td>

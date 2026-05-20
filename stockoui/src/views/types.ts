@@ -3,13 +3,24 @@ export interface TickerOverview {
     symbol: string;
     sectorKey: string;
     industryKey: string;
-    exDividendDateUtc: string;
+    industry: string;
+    sector: string;
+    exDividendDate: string;
+    lastDividendDate: string;
     longName: string;
-    currentPrice: number;
+    regularMarketPrice: number;
+    regularMarketTime: number;
     dividendRate: number;
     dividendYield: number;
     marketCap: number;
     payoutRatio: number;
+    heldPercentInsiders: number;
+    heldPercentInstitutions: number;
+    quoteType: string;
+    typeDisp: string;
+    lastDividendDecrease: string;
+    yearsSinceDividendDecrease: number;
+    yearsConsecutiveDividendIncrease: number;
     ttmDivs: number;
 }
 
