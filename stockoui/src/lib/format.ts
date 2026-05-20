@@ -22,3 +22,20 @@ export function formatMarketCap(value: number): string {
     const millions = Math.round(value / 1e6);
     return `${cad(millions, 0, 0)}M`;
 }
+
+export function formatEpochSeconds(epochSeconds: number): string {
+    return epochSeconds === 0 ? '' : new Date(epochSeconds * 1000).toLocaleString();
+}
+
+export function formatFractionAsPercent(value: number): string {
+    return `${(value * 100).toFixed(2)}%`;
+}
+
+/** Drop a leading sector prefix and following punctuation from industry labels. */
+export function formatIndustryLabel(sector: string, industry: string): string {
+    if (!sector || !industry.startsWith(sector)) {
+        return industry;
+    }
+    const trimmed = industry.slice(sector.length).replace(/^[^a-zA-Z0-9]+/, '');
+    return trimmed || industry;
+}

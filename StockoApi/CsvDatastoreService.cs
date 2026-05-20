@@ -88,13 +88,21 @@ namespace StockoApi
                     Symbol: row.Symbol,
                     SectorKey: row.SectorKey ?? string.Empty,
                     IndustryKey: row.IndustryKey ?? string.Empty,
-                    ExDividendDateUtc: row.ExDividendDateUtc,
+                    Industry: row.Industry ?? string.Empty,
+                    Sector: row.Sector ?? string.Empty,
+                    ExDividendDate: row.ExDividendDate,
+                    LastDividendDate: row.LastDividendDate,
                     LongName: row.LongName ?? string.Empty,
-                    CurrentPrice: row.CurrentPrice,
+                    RegularMarketPrice: row.RegularMarketPrice,
+                    RegularMarketTime: row.RegularMarketTime,
                     DividendRate: row.DividendRate,
                     DividendYield: row.DividendYield,
                     MarketCap: row.MarketCap,
                     PayoutRatio: row.PayoutRatio,
+                    HeldPercentInsiders: row.HeldPercentInsiders,
+                    HeldPercentInstitutions: row.HeldPercentInstitutions,
+                    QuoteType: row.QuoteType ?? string.Empty,
+                    TypeDisp: row.TypeDisp ?? string.Empty,
                     TtmDivs: ttm));
             }
 
@@ -159,13 +167,21 @@ namespace StockoApi
             public string Symbol { get; set; } = string.Empty;
             public string? SectorKey { get; set; }
             public string? IndustryKey { get; set; }
-            public DateOnly ExDividendDateUtc { get; set; }
+            public string? Industry { get; set; }
+            public string? Sector { get; set; }
+            public DateOnly ExDividendDate { get; set; }
+            public DateOnly LastDividendDate { get; set; }
             public string? LongName { get; set; }
-            public decimal CurrentPrice { get; set; }
+            public decimal RegularMarketPrice { get; set; }
+            public long RegularMarketTime { get; set; }
             public decimal DividendRate { get; set; }
             public double DividendYield { get; set; }
             public long MarketCap { get; set; }
             public double PayoutRatio { get; set; }
+            public double HeldPercentInsiders { get; set; }
+            public double HeldPercentInstitutions { get; set; }
+            public string? QuoteType { get; set; }
+            public string? TypeDisp { get; set; }
         }
 
         private sealed class TickerRowMap : ClassMap<TickerRow>
@@ -176,16 +192,25 @@ namespace StockoApi
                 Map(r => r.Symbol).Default(string.Empty);
                 Map(r => r.SectorKey).Default(string.Empty);
                 Map(r => r.IndustryKey).Default(string.Empty);
-                Map(r => r.ExDividendDateUtc)
-                    .Name("ExDividendDateUtc", "exDividendDate")
+                Map(r => r.Industry).Default(string.Empty);
+                Map(r => r.Sector).Default(string.Empty);
+                Map(r => r.ExDividendDate)
+                    .TypeConverter<EpochOrDateOnlyConverter>()
+                    .Default(default(DateOnly));
+                Map(r => r.LastDividendDate)
                     .TypeConverter<EpochOrDateOnlyConverter>()
                     .Default(default(DateOnly));
                 Map(r => r.LongName).Default(string.Empty);
-                Map(r => r.CurrentPrice).Default(0m);
+                Map(r => r.RegularMarketPrice).Default(0m);
+                Map(r => r.RegularMarketTime).Default(0L);
                 Map(r => r.DividendRate).Default(0m);
                 Map(r => r.DividendYield).Default(0d);
                 Map(r => r.MarketCap).Default(0L);
                 Map(r => r.PayoutRatio).Default(0d);
+                Map(r => r.HeldPercentInsiders).Default(0d);
+                Map(r => r.HeldPercentInstitutions).Default(0d);
+                Map(r => r.QuoteType).Default(string.Empty);
+                Map(r => r.TypeDisp).Default(string.Empty);
             }
         }
 
@@ -204,8 +229,8 @@ namespace StockoApi
             }
         }
 
-        // tickers.csv stores exDividendDate as a Unix-epoch seconds value; accept
-        // either that or a parseable date string and fall back to default(DateOnly).
+        // tickers.csv stores date fields as Unix-epoch seconds or ISO dates; accept
+        // either and fall back to default(DateOnly).
         private sealed class EpochOrDateOnlyConverter : DefaultTypeConverter
         {
             public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)

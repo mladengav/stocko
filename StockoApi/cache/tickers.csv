@@ -1,21 +1,22 @@
-snapshotDate,symbol,sectorKey,industryKey,exDividendDate,longName,currentPrice,dividendRate,dividendYield,marketCap,payoutRatio
-2026-05-15,TD.TO,financial-services,banks-diversified,1775692800,The Toronto-Dominion Bank,147.33,4.32,2.91,247039442944,0.3425
-2026-05-15,SLF.TO,financial-services,insurance-diversified,1779840000,Sun Life Financial Inc.,98.41,3.68,3.74,54527406080,0.6704
-2026-05-15,ENGH.TO,technology,software-application,1778803200,Enghouse Systems Limited,16.68,1.24,7.39,909036864,0.9206
-2026-05-15,ENB.TO,energy,oil-gas-midstream,1778803200,Enbridge Inc.,75.37,3.88,5.03,164585209856,1.2873
-2026-05-15,PPL.TO,energy,oil-gas-midstream,1781481600,Pembina Pipeline Corporation,66.56,2.87,4.29,38700314624,1.0676999
-2026-05-15,CAS.TO,consumer-cyclical,packaging-containers,1779321600,Cascades Inc.,10.49,0.48,4.58,1062744064,0.48
-2026-05-15,CNQ.TO,energy,oil-gas-e-p,1781827200,Canadian Natural Resources Limited,65.76,2.5,3.83,137156288512,0.45540002
-2026-05-15,CPX.TO,utilities,utilities-independent-power-producers,1782777600,Capital Power Corporation,63.65,2.76,4.31,9960143872,3.052
-2026-05-15,EMA.TO,utilities,utilities-regulated-electric,1777593600,Emera Incorporated,71.27,2.92,4.07,21801492480,0.8914
-2026-05-15,CVE.TO,energy,oil-gas-integrated,1781481600,Cenovus Energy Inc.,41.85,0.88,2.13,78042669056,0.31870002
-2026-05-15,WTE.TO,industrials,marine-shipping,1782777600,Westshore Terminals Investment Corporation,39.16,1.5,3.8,2418904064,0.94339997
-2026-05-15,CM.TO,financial-services,banks-diversified,1774569600,Canadian Imperial Bank of Commerce,152.92,4.28,2.79,140739919872,0.415
-2026-05-15,CTC-A.TO,consumer-cyclical,specialty-retail,1785456000,"Canadian Tire Corporation, Limited",170.95,7.2,4.12,9010483200,0.5888
-2026-05-15,FTS.TO,utilities,utilities-regulated-electric,1778803200,Fortis Inc.,76.06,2.54,3.27,38724653056,0.7404
-2026-05-15,SOBO.TO,energy,oil-gas-midstream,1782777600,South Bow Corporation,50.77,2.73,5.43,10589841408,0.9901
-2026-05-15,BCE.TO,communication-services,telecom-services,1781481600,BCE Inc.,33.295,1.75,5.27,31048445952,0.2585
-2026-05-15,CGO.TO,communication-services,telecom-services,1776902400,Cogeco Inc.,62.17,3.95,6.36,588768320,0.4373
-2026-05-15,T.TO,communication-services,telecom-services,1781049600,TELUS Corporation,16.96,1.67,9.84,26480476160,2.7823
-2026-05-15,CU.TO,utilities,utilities-diversified,1778112000,Canadian Utilities Limited,48.27,1.84,3.77,13144673280,18.354
-2026-05-15,TRP.TO,energy,oil-gas-midstream,1782777600,TC Energy Corporation,93.26,3.51,3.75,97155186688,1.0111
+snapshotDate,symbol,sectorKey,industryKey,industry,sector,exDividendDate,lastDividendDate,longName,regularMarketPrice,regularMarketTime,dividendRate,dividendYield,marketCap,payoutRatio,heldPercentInsiders,heldPercentInstitutions,quoteType,typeDisp
+2026-05-19,TD.TO,financial-services,banks-diversified,Banks - Diversified,Financial Services,1775692800,1775692800,The Toronto-Dominion Bank,148.38,1779220800,4.32,2.91,248800067584,0.3425,0.00044,0.55098,EQUITY,Equity
+2026-05-19,BNS.TO,financial-services,banks-diversified,Banks - Diversified,Financial Services,1775520000,1775520000,The Bank of Nova Scotia,106.33,1779220800,4.4,4.14,130938339328,0.6469,0.00021,0.50928,EQUITY,Equity
+2026-05-19,BCE.TO,communication-services,telecom-services,Telecom Services,Communication Services,1781481600,1773619200,BCE Inc.,32.98,1779220800,1.75,5.35,30754701312,0.2585,0.00031,0.49567002,EQUITY,Equity
+2026-05-20,CM.TO,financial-services,banks-diversified,Banks - Diversified,Financial Services,1774569600,1774569600,Canadian Imperial Bank of Commerce,154.42,1779220800,4.28,2.77,142120452096,0.415,0.00022,0.53187,EQUITY,Equity
+2026-05-20,WTE.TO,industrials,marine-shipping,Marine Shipping,Industrials,1782777600,1774915200,Westshore Terminals Investment Corporation,40.0,1779220800,1.5,3.75,2470790656,0.94339997,0.47654998,0.098000005,EQUITY,Equity
+2026-05-20,CTC-A.TO,consumer-cyclical,specialty-retail,Specialty Retail,Consumer Cyclical,1785456000,1777507200,"Canadian Tire Corporation, Limited",171.34,1779220801,7.2,4.2,9014693888,0.5888,0.0202,0.38317,EQUITY,Equity
+2026-05-20,CAS.TO,consumer-cyclical,packaging-containers,Packaging & Containers,Consumer Cyclical,1779321600,1773273600,Cascades Inc.,10.31,1779220800,0.48,4.66,1044552512,0.48,0.23747998,0.26542,EQUITY,Equity
+2026-05-20,CU.TO,utilities,utilities-diversified,Utilities - Diversified,Utilities,1778112000,1778112000,Canadian Utilities Limited,49.0,1779220800,1.84,3.76,13343463424,18.354,0.0033000002,0.19692,EQUITY,Equity
+2026-05-20,CNQ.TO,energy,oil-gas-e-p,Oil & Gas E&P,Energy,1781827200,1773964800,Canadian Natural Resources Limited,67.95,1779220801,2.5,3.68,141723992064,0.45540002,0.02174,0.8022,EQUITY,Equity
+2026-05-20,SOBO.TO,energy,oil-gas-midstream,Oil & Gas Midstream,Energy,1782777600,1774915200,South Bow Corporation,51.5,1779220800,2.73,5.3,10742108160,0.9901,0.00082,0.67824,EQUITY,Equity
+2026-05-20,FTS.TO,utilities,utilities-regulated-electric,Utilities - Regulated Electric,Utilities,1778803200,1778803200,Fortis Inc.,76.8,1779220800,2.54,3.3,39101415424,0.7404,0.0020299999,0.56497,EQUITY,Equity
+2026-05-20,SLF.TO,financial-services,insurance-diversified,Insurance - Diversified,Financial Services,1779840000,1771977600,Sun Life Financial Inc.,98.41,1779220800,3.68,3.74,54527406080,0.6704,0.00064000004,0.55879,EQUITY,Equity
+2026-05-20,CGO.TO,communication-services,telecom-services,Telecom Services,Communication Services,1776902400,1776902400,Cogeco Inc.,62.81,1779220740,3.95,6.29,594829376,0.4373,0.01904,0.23916,EQUITY,Equity
+2026-05-20,ENGH.TO,technology,software-application,Software - Application,Technology,1778803200,1778803200,Enghouse Systems Limited,16.96,1779220801,1.24,7.31,924296384,0.9206,0.22259001,0.36973998,EQUITY,Equity
+2026-05-20,PPL.TO,energy,oil-gas-midstream,Oil & Gas Midstream,Energy,1781481600,1773619200,Pembina Pipeline Corporation,68.17,1779220800,2.87,4.2,39636422656,1.0676999,0.00042,0.58816004,EQUITY,Equity
+2026-05-20,T.TO,communication-services,telecom-services,Telecom Services,Communication Services,1781049600,1773187200,TELUS Corporation,16.95,1779220800,1.67,9.87,26464864256,2.7823,0.00057,0.50897,EQUITY,Equity
+2026-05-20,EMA.TO,utilities,utilities-regulated-electric,Utilities - Regulated Electric,Utilities,1777593600,1777593600,Emera Incorporated,72.08,1779220801,2.92,4.05,22049271808,0.8914,0.0029300002,0.55346,EQUITY,Equity
+2026-05-20,ENB.TO,energy,oil-gas-midstream,Oil & Gas Midstream,Energy,1778803200,1778803200,Enbridge Inc.,78.22,1779220801,3.88,4.96,170808737792,1.2873,0.00127,0.52899,EQUITY,Equity
+2026-05-20,CVE.TO,energy,oil-gas-integrated,Oil & Gas Integrated,Energy,1781481600,1773360000,Cenovus Energy Inc.,43.7,1779220800,0.88,2.01,81492590592,0.31870002,0.28871,0.54763,EQUITY,Equity
+2026-05-20,TRP.TO,energy,oil-gas-midstream,Oil & Gas Midstream,Energy,1782777600,1774915200,TC Energy Corporation,95.45,1779220800,3.51,3.68,99436650496,1.0111,0.00048000002,0.75958997,EQUITY,Equity
+2026-05-20,CPX.TO,utilities,utilities-independent-power-producers,Utilities - Independent Power Producers,Utilities,1782777600,1774915200,Capital Power Corporation,62.97,1779220800,2.76,4.39,9853734912,3.052,0.00043000001,0.26919,EQUITY,Equity

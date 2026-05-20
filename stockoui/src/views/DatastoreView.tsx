@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { currencyFormatter } from '../lib/format';
+import { currencyFormatter, formatEpochSeconds, formatFractionAsPercent, formatIndustryLabel, formatMarketCap } from '../lib/format';
 import type { TickerOverview } from './types';
 
 function DatastoreView() {
@@ -22,11 +22,16 @@ function DatastoreView() {
                     <th>Industry</th>
                     <th>Snapshot</th>
                     <th>Ex-Div</th>
+                    <th>Last Div</th>
+                    <th>Market Time</th>
                     <th>Price</th>
                     <th>Div Rate</th>
                     <th>Div Yield</th>
                     <th>Market Cap</th>
                     <th>Payout Ratio</th>
+                    <th>% Insiders</th>
+                    <th>% Institutions</th>
+                    <th>Type</th>
                     <th>TtmDivs</th>
                 </tr>
             </thead>
@@ -35,15 +40,20 @@ function DatastoreView() {
                     <tr key={ticker.symbol}>
                         <td>{ticker.symbol}</td>
                         <td>{ticker.longName}</td>
-                        <td>{ticker.sectorKey}</td>
-                        <td>{ticker.industryKey}</td>
+                        <td>{ticker.sector}</td>
+                        <td>{formatIndustryLabel(ticker.sector, ticker.industry)}</td>
                         <td>{ticker.snapshotDate}</td>
-                        <td>{ticker.exDividendDateUtc}</td>
-                        <td>{currencyFormatter.format(ticker.currentPrice)}</td>
+                        <td>{ticker.exDividendDate}</td>
+                        <td>{ticker.lastDividendDate}</td>
+                        <td>{formatEpochSeconds(ticker.regularMarketTime)}</td>
+                        <td>{currencyFormatter.format(ticker.regularMarketPrice)}</td>
                         <td>{currencyFormatter.format(ticker.dividendRate)}</td>
-                        <td>{(ticker.dividendYield * 100).toFixed(2)}%</td>
-                        <td>{currencyFormatter.format(ticker.marketCap)}</td>
-                        <td>{(ticker.payoutRatio * 100).toFixed(2)}%</td>
+                        <td>{ticker.dividendYield.toFixed(2)}%</td>
+                        <td>{formatMarketCap(ticker.marketCap)}</td>
+                        <td>{formatFractionAsPercent(ticker.payoutRatio)}</td>
+                        <td>{formatFractionAsPercent(ticker.heldPercentInsiders)}</td>
+                        <td>{formatFractionAsPercent(ticker.heldPercentInstitutions)}</td>
+                        <td>{ticker.typeDisp}</td>
                         <td>{currencyFormatter.format(ticker.ttmDivs)}</td>
                     </tr>
                 )}

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { currencyFormatter, formatMarketCap } from '../lib/format';
+import { currencyFormatter, formatEpochSeconds, formatFractionAsPercent, formatIndustryLabel, formatMarketCap } from '../lib/format';
 import PortfolioAllocations from './PortfolioAllocations';
 import ReportInput from './ReportInput';
 import type { Position, TickerOverview } from './types';
@@ -24,7 +24,7 @@ function ClientSideReportView() {
                 return {
                     ticker,
                     quantity: p.quantity,
-                    positionValue: ticker.currentPrice * p.quantity,
+                    positionValue: ticker.regularMarketPrice * p.quantity,
                     positionFwdDividend: ticker.dividendRate * p.quantity,
                     positionTtmDividend: ticker.ttmDivs * p.quantity,
                 };
@@ -123,10 +123,14 @@ function ClientSideReportView() {
                     <th>Industry</th>
                     <th>Snapshot</th>
                     <th>Ex-Div</th>
-                    <th>Div Rate</th>
+                    <th>Last Div</th>
+                    <th>Market Time</th>
                     <th>Div Yield</th>
                     <th>Market Cap</th>
                     <th>Payout Ratio</th>
+                    <th>% Insiders</th>
+                    <th>% Institutions</th>
+                    <th>Type</th>
                 </tr>
             </thead>
             <tbody>
@@ -134,21 +138,25 @@ function ClientSideReportView() {
                     <tr key={row.ticker.symbol}>
                         <td>{row.ticker.symbol}</td>
                         <td>{row.ticker.longName}</td>
-                        <td>{currencyFormatter.format(row.ticker.currentPrice)}</td>
+                        <td>{currencyFormatter.format(row.ticker.regularMarketPrice)}</td>
                         <td>{row.quantity}</td>
                         <td>{currencyFormatter.format(row.positionValue)}</td>
                         <td>{currencyFormatter.format(row.ticker.dividendRate)}</td>
                         <td>{currencyFormatter.format(row.positionFwdDividend)}</td>
                         <td>{currencyFormatter.format(row.ticker.ttmDivs)}</td>
                         <td>{currencyFormatter.format(row.positionTtmDividend)}</td>
-                        <td>{row.ticker.sectorKey}</td>
-                        <td>{row.ticker.industryKey}</td>
+                        <td>{row.ticker.sector}</td>
+                        <td>{formatIndustryLabel(row.ticker.sector, row.ticker.industry)}</td>
                         <td>{row.ticker.snapshotDate}</td>
-                        <td>{row.ticker.exDividendDateUtc}</td>
-                        <td>{currencyFormatter.format(row.ticker.dividendRate)}</td>
-                        <td>{(row.ticker.dividendYield).toFixed(2)}%</td>
+                        <td>{row.ticker.exDividendDate}</td>
+                        <td>{row.ticker.lastDividendDate}</td>
+                        <td>{formatEpochSeconds(row.ticker.regularMarketTime)}</td>
+                        <td>{row.ticker.dividendYield.toFixed(2)}%</td>
                         <td>{formatMarketCap(row.ticker.marketCap)}</td>
-                        <td>{(row.ticker.payoutRatio * 100).toFixed(2)}%</td>
+                        <td>{formatFractionAsPercent(row.ticker.payoutRatio)}</td>
+                        <td>{formatFractionAsPercent(row.ticker.heldPercentInsiders)}</td>
+                        <td>{formatFractionAsPercent(row.ticker.heldPercentInstitutions)}</td>
+                        <td>{row.ticker.typeDisp}</td>
                     </tr>
                 )}
             </tbody>
