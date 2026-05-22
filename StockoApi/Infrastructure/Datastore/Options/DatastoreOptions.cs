@@ -9,8 +9,7 @@ namespace StockoApi.Infrastructure.Datastore.Options
     }
 
     /// <summary>
-    /// Configuration options for the datastore layer, bound from the
-    /// <c>Datastore</c> configuration section.
+    /// Configuration options for the datastore layer
     /// </summary>
     public sealed class DatastoreOptions
     {

@@ -18,9 +18,7 @@ namespace StockoApi.Infrastructure.Datastore
     {
         private const string ContainerName = "csvcache";  //TODO Factor out to Options
 
-        // Refresh interval is intentionally kept as a raw config key rather than
-        // a member of StockoDatastoreOptions because it is an operational tuning
-        // knob, not a structural datastore setting.
+        //TODO add to DatastoreOptions and validate
         private const string RefreshSecondsKey = "AZURE_STORAGE_BLOB_REFRESH_SECONDS";
         private const int DefaultRefreshSeconds = 30;
 
@@ -71,10 +69,6 @@ namespace StockoApi.Infrastructure.Datastore
 
         /// <summary>
         /// Builds an Azure <see cref="TokenCredential"/> from the supplied options.
-        /// When all three service-principal fields are present, a
-        /// <see cref="ClientSecretCredential"/> is used; otherwise the runtime falls
-        /// back to <see cref="DefaultAzureCredential"/> (managed identity, Azure CLI,
-        /// Visual Studio, etc.).
         /// </summary>
         private static TokenCredential BuildCredential(DatastoreOptions options)
         {

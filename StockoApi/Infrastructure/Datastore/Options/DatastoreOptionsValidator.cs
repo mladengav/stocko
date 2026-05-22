@@ -60,7 +60,7 @@ namespace StockoApi.Infrastructure.Datastore.Options
         private static void ValidateAzureOptions(
             DatastoreOptions options, List<string> errors)
         {
-            RequireNonWhiteSpace(options.AzureStorageBlobUrl,
+            RequireNonWhiteSpace(options.AzureStorageBlobUrl, //TODO Maybe more specific URL validation?
                 nameof(options.AzureStorageBlobUrl), errors);
 
             RequireNonWhiteSpace(options.AzureClientId,

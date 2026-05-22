@@ -27,7 +27,7 @@ namespace StockoApi.Infrastructure.Datastore
         /// <see cref="DatastoreOptionsValidator"/>).
         /// </summary>
         public CsvDatastoreService(IOptions<DatastoreOptions> options)
-            : this(options.Value.CsvCacheFolder!)
+            : this(options.Value.CsvCacheFolder)
         {
         }
 
@@ -182,7 +182,7 @@ namespace StockoApi.Infrastructure.Datastore
                 var ttm = ttmBySymbol.TryGetValue(row.Symbol, out var t) ? t : 0m;
                 var lastDecrease = lastDecreaseBySymbol.TryGetValue(row.Symbol, out var ld)
                     ? ld
-                    : default(DateOnly);
+                    : default;
                 var yearsSinceDecrease = yearsSinceDecreaseBySymbol.TryGetValue(row.Symbol, out var ysd)
                     ? ysd
                     : 0;
