@@ -2,7 +2,9 @@ using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
+using Microsoft.Extensions.Options;
 using StockoApi.Application;
+using StockoApi.Infrastructure.Datastore.Options;
 
 namespace StockoApi.Infrastructure.Datastore
 {
@@ -19,8 +21,13 @@ namespace StockoApi.Infrastructure.Datastore
 
         protected string CacheFolder => _cacheFolder;
 
-        public CsvDatastoreService(IWebHostEnvironment env)
-            : this(ResolveCacheFolder(env.ContentRootPath))
+        /// <summary>
+        /// DI constructor. Reads <see cref="DatastoreOptions.CsvCacheFolder"/>
+        /// from the bound options (validated at startup by
+        /// <see cref="DatastoreOptionsValidator"/>).
+        /// </summary>
+        public CsvDatastoreService(IOptions<DatastoreOptions> options)
+            : this(options.Value.CsvCacheFolder!)
         {
         }
 
@@ -203,25 +210,19 @@ namespace StockoApi.Infrastructure.Datastore
                     HeldPercentInstitutions: row.HeldPercentInstitutions,
                     QuoteType: row.QuoteType ?? string.Empty,
                     TypeDisp: row.TypeDisp ?? string.Empty,
+                    TtmDivs: ttm,
                     LastDividendDecrease: lastDecrease,
                     YearsSinceDividendDecrease: yearsSinceDecrease,
-                    YearsConsecutiveDividendIncrease: consecutiveIncrease,
-                    TtmDivs: ttm));
+                    YearsConsecutiveDividendIncrease: consecutiveIncrease));
             }
 
             return records;
         }
 
-        // Case-insensitive header matching, ignore unknown/missing columns, swallow
-        // bad cells so a single bad row doesn't fail the whole file. Type-level
-        // defaults are applied per ClassMap below.
         private static CsvConfiguration CreateConfig() => new(CultureInfo.InvariantCulture)
         {
-            PrepareHeaderForMatch = args => args.Header?.Trim().ToLowerInvariant() ?? string.Empty,
-            HeaderValidated = null,
+            HasHeaderRecord = true,
             MissingFieldFound = null,
-            BadDataFound = null,
-            TrimOptions = TrimOptions.Trim,
         };
 
         // Treat an empty cell as null so the per-member .Default(...) is applied
@@ -243,25 +244,6 @@ namespace StockoApi.Infrastructure.Datastore
                     options.NullValues.Add(string.Empty);
                 }
             }
-        }
-
-        // Probe likely locations so the service works whether the app is launched from
-        // the project root (dev) or the publish output (production), regardless of cwd.
-        private static string ResolveCacheFolder(string contentRoot)
-        {
-            var fromContentRoot = Path.Combine(contentRoot, "cache");
-            if (Directory.Exists(fromContentRoot))
-            {
-                return fromContentRoot;
-            }
-
-            var fromBaseDir = Path.Combine(AppContext.BaseDirectory, "cache");
-            if (Directory.Exists(fromBaseDir))
-            {
-                return fromBaseDir;
-            }
-
-            return fromContentRoot;
         }
 
         private sealed class TickerRow

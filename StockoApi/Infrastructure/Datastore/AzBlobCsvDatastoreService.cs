@@ -2,7 +2,9 @@ using Azure.Core;
 using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Microsoft.Extensions.Options;
 using StockoApi.Application;
+using StockoApi.Infrastructure.Datastore.Options;
 
 namespace StockoApi.Infrastructure.Datastore
 {
@@ -15,10 +17,10 @@ namespace StockoApi.Infrastructure.Datastore
     public sealed class AzBlobCsvDatastoreService : CsvDatastoreService, IDisposable
     {
         private const string ContainerName = "csvcache";
-        private const string BlobUrlKey = "AZURE_STORAGE_BLOB_URL";
-        private const string ClientIdKey = "AZURE_CLIENT_ID";
-        private const string TenantIdKey = "AZURE_TENANT_ID";
-        private const string ClientSecretKey = "AZURE_CLIENT_SECRET";
+
+        // Refresh interval is intentionally kept as a raw config key rather than
+        // a member of StockoDatastoreOptions because it is an operational tuning
+        // knob, not a structural datastore setting.
         private const string RefreshSecondsKey = "AZURE_STORAGE_BLOB_REFRESH_SECONDS";
         private const int DefaultRefreshSeconds = 30;
 
@@ -31,22 +33,21 @@ namespace StockoApi.Infrastructure.Datastore
         private bool _disposed;
 
         public AzBlobCsvDatastoreService(
-            IWebHostEnvironment env,
+            IOptions<DatastoreOptions> options,
             IConfiguration config,
             ILogger<AzBlobCsvDatastoreService> logger)
-            : base(env)
+            : base(options)
         {
             _logger = logger;
             Directory.CreateDirectory(CacheFolder);
 
-            var storageUrl = config[BlobUrlKey];
-            if (string.IsNullOrWhiteSpace(storageUrl))
-            {
-                throw new InvalidOperationException(
-                    $"Configuration value '{BlobUrlKey}' is required for {nameof(AzBlobCsvDatastoreService)}.");
-            }
+            var datastoreOptions = options.Value;
 
-            _container = new BlobServiceClient(new Uri(storageUrl), BuildCredential(config))
+            // AzureStorageBlobUrl is guaranteed non-null/non-whitespace here because
+            // StockoDatastoreOptionsValidator rejects AzureBlobCsv configs without it.
+            var storageUrl = datastoreOptions.AzureStorageBlobUrl!;
+
+            _container = new BlobServiceClient(new Uri(storageUrl), BuildCredential(datastoreOptions))
                 .GetBlobContainerClient(ContainerName);
 
             // Kick off the initial sync as a background task so DI construction stays fast.
@@ -68,20 +69,25 @@ namespace StockoApi.Infrastructure.Datastore
             return await base.GetOverviewAsync();
         }
 
-        private static TokenCredential BuildCredential(IConfiguration config)
+        /// <summary>
+        /// Builds an Azure <see cref="TokenCredential"/> from the supplied options.
+        /// When all three service-principal fields are present, a
+        /// <see cref="ClientSecretCredential"/> is used; otherwise the runtime falls
+        /// back to <see cref="DefaultAzureCredential"/> (managed identity, Azure CLI,
+        /// Visual Studio, etc.).
+        /// </summary>
+        private static TokenCredential BuildCredential(DatastoreOptions options)
         {
-            var clientId = config[ClientIdKey];
-            var tenantId = config[TenantIdKey];
-            var clientSecret = config[ClientSecretKey];
-
-            if (!string.IsNullOrWhiteSpace(clientId)
-                && !string.IsNullOrWhiteSpace(tenantId)
-                && !string.IsNullOrWhiteSpace(clientSecret))
+            if (!string.IsNullOrWhiteSpace(options.AzureClientId)
+                && !string.IsNullOrWhiteSpace(options.AzureTenantId)
+                && !string.IsNullOrWhiteSpace(options.AzureClientSecret))
             {
-                return new ClientSecretCredential(tenantId, clientId, clientSecret);
+                return new ClientSecretCredential(
+                    options.AzureTenantId,
+                    options.AzureClientId,
+                    options.AzureClientSecret);
             }
 
-            // Fall back to DefaultAzureCredential (managed identity, Azure CLI, VS, etc.).
             return new DefaultAzureCredential();
         }
 

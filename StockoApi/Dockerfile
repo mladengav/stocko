@@ -35,4 +35,9 @@ RUN dotnet publish "./StockoApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+# Copy the published cache folder into /srv/stocko/cache and ensure the runtime can read/write it.
+RUN mkdir -p /srv/stocko \
+ && if [ -d /app/cache ]; then cp -a /app/cache /srv/stocko/; fi \
+ && chown -R $APP_UID:$APP_GID /srv/stocko/cache 2>/dev/null || true \
+ && chmod -R 0777 /srv/stocko/cache
 ENTRYPOINT ["dotnet", "StockoApi.dll"]
