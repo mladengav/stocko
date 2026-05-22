@@ -29,30 +29,15 @@ namespace StockoApi.Presentation
             {
                 var opts = sp.GetRequiredService<IOptions<DatastoreOptions>>().Value;
 
-                return opts.DatastoreType switch
+                var datastore = opts.DatastoreType switch
                 {
-                    DatastoreType.AzureBlobCsv => ActivateAzBlobCsvDatastore(),
-
-                    DatastoreType.Csv => ActivateCsvDatastore(),
-
-                    _ => throw new InvalidOperationException(
-                             $"Unsupported DatastoreType '{opts.DatastoreType}'. " +
-                             $"Expected one of: {string.Join(", ", Enum.GetNames<DatastoreType>())}.")
+                    DatastoreType.AzureBlobCsv => ActivatorUtilities.CreateInstance<AzBlobCsvDatastoreService>(sp),
+                    DatastoreType.Csv => ActivatorUtilities.CreateInstance<CsvDatastoreService>(sp),
+                    _ => throw new InvalidOperationException($"Unsupported DatastoreType '{opts.DatastoreType}'. ")
                 };
 
-                AzBlobCsvDatastoreService ActivateAzBlobCsvDatastore()
-                {
-                    var datastore = ActivatorUtilities.CreateInstance<AzBlobCsvDatastoreService>(sp);
-                    Log.Logger.Information("Activated datastore type:  {DatastoreType}", DatastoreType.AzureBlobCsv);
-                    return datastore;
-                }
-
-                CsvDatastoreService ActivateCsvDatastore()
-                {
-                    var datastore = ActivatorUtilities.CreateInstance<CsvDatastoreService>(sp);
-                    Log.Logger.Information("Activated datastore type:  {DatastoreType}", DatastoreType.Csv);
-                    return datastore;
-                }
+                Log.Logger.Information("Activated datastore type:  {DatastoreType}", opts.DatastoreType);
+                return datastore;
             });
 
             return services;

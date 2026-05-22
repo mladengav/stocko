@@ -16,7 +16,7 @@ namespace StockoApi.Infrastructure.Datastore
     /// </summary>
     public sealed class AzBlobCsvDatastoreService : CsvDatastoreService, IDisposable
     {
-        private const string ContainerName = "csvcache";
+        private const string ContainerName = "csvcache";  //TODO Factor out to Options
 
         // Refresh interval is intentionally kept as a raw config key rather than
         // a member of StockoDatastoreOptions because it is an operational tuning
@@ -78,17 +78,11 @@ namespace StockoApi.Infrastructure.Datastore
         /// </summary>
         private static TokenCredential BuildCredential(DatastoreOptions options)
         {
-            if (!string.IsNullOrWhiteSpace(options.AzureClientId)
-                && !string.IsNullOrWhiteSpace(options.AzureTenantId)
-                && !string.IsNullOrWhiteSpace(options.AzureClientSecret))
-            {
-                return new ClientSecretCredential(
-                    options.AzureTenantId,
-                    options.AzureClientId,
-                    options.AzureClientSecret);
-            }
-
-            return new DefaultAzureCredential();
+            //options have been validated on init, non-null and non-empty
+            return new ClientSecretCredential(
+                options.AzureTenantId,
+                options.AzureClientId,
+                options.AzureClientSecret);
         }
 
         private static int ResolveRefreshSeconds(IConfiguration config)
@@ -192,8 +186,7 @@ namespace StockoApi.Infrastructure.Datastore
 
                 File.Move(tempPath, targetPath, overwrite: true);
 
-                _logger.LogInformation(
-                    "Synced blob '{Blob}' to '{Target}'.", blob.Name, targetPath);
+                _logger.LogInformation("Synced blob '{Blob}' to '{Target}'.", blob.Name, targetPath);
             }
             catch
             {

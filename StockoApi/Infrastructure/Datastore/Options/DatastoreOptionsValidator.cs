@@ -12,6 +12,13 @@ namespace StockoApi.Infrastructure.Datastore.Options
         {
             var errors = new List<string>();
 
+            if (options.DatastoreType == DatastoreType.None)
+                return ValidateOptionsResult.Fail(
+                        $"Unsupported DatastoreType '{options.DatastoreType}'. " +
+                        $"Expected one of: {string.Join(", ",
+                            Enum.GetNames<DatastoreType>()
+                            .Where(typeName => typeName != DatastoreType.None.ToString()))}.");
+
             ValidateCsvCacheFolder(options, errors);
 
             if (options.DatastoreType == DatastoreType.AzureBlobCsv)

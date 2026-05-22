@@ -36,26 +36,27 @@ namespace StockoApi
                 builder.Services.AddScoped<IReportService, ReportService>();
 
                 var app = builder.Build();
-
-                app.UseDefaultFiles();
-                app.MapStaticAssets();
+                                
+                app.UseSerilogRequestLogging();
 
                 // Configure the HTTP request pipeline.
+                app.UseHttpsRedirection();
+                app.UseDefaultFiles();
+
+                app.UseAuthorization();
+                
                 if (app.Environment.IsDevelopment())
                 {
                     app.MapOpenApi();
                     app.MapScalarApiReference();
                 }
-
-                app.UseHttpsRedirection();
-
-                app.UseAuthorization();
+                
+                app.MapStaticAssets();
+                app.MapFallbackToFile("/index.html");
 
                 app.MapDatastoreEndpoints();
                 app.MapReportEndpoints();
-
-                app.MapFallbackToFile("/index.html");
-
+                
                 app.Run();
             }
             catch (Exception ex)
