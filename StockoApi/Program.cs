@@ -23,6 +23,8 @@ namespace StockoApi
                     .ReadFrom.Configuration(builder.Configuration)
                     .ReadFrom.Services(services));
 
+                //TODO:  Add ProblemDetails and GlobalExceptionHandler when endpoints are expanded to return custom errors
+
                 // Add services to the container.
                 builder.Services.AddAuthorization();
 
