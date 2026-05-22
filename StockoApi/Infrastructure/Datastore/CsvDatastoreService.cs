@@ -223,6 +223,8 @@ namespace StockoApi.Infrastructure.Datastore
         {
             HasHeaderRecord = true,
             MissingFieldFound = null,
+            //support various casing of headers
+            PrepareHeaderForMatch = args => args.Header.Trim().ToLowerInvariant()
         };
 
         // Treat an empty cell as null so the per-member .Default(...) is applied

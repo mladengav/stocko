@@ -1,7 +1,9 @@
-﻿namespace StockoApi.Infrastructure.Datastore.Options
+﻿
+namespace StockoApi.Infrastructure.Datastore.Options
 {
     public enum DatastoreType
     {
+        None = 0,
         Csv,
         AzureBlobCsv,
     }
@@ -25,7 +27,7 @@
         /// Absolute or relative path to the local CSV cache folder.
         /// Required for both datastore types.
         /// </summary>
-        public string? CsvCacheFolder { get; set; } = "/srv/cache";
+        public string CsvCacheFolder { get; set; } = "cache";
 
         // ── Azure Blob Storage ────────────────────────────────────────────────
         // Required when DatastoreType is AzureBlobCsv.
