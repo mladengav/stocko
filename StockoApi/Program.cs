@@ -24,6 +24,7 @@ namespace StockoApi
                     .ReadFrom.Services(services));
 
                 //TODO:  Add ProblemDetails and GlobalExceptionHandler
+                //TOOD:  Add IMemoryCache and action endpoint filter on datastore
 
                 // Add services to the container.
                 builder.Services.AddAuthorization();
