@@ -204,7 +204,7 @@ function DatastoreView() {
 
     useEffect(() => {
         if (tickers === undefined) {
-            populateDatastoreData();
+            populateDatastoreData();  //TODO use TanStack Query to cache tickers and reduce calls to back end
         }
     }, [tickers]);
 
