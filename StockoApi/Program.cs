@@ -43,7 +43,10 @@ namespace StockoApi
 
                 // Configure the HTTP request pipeline.
                 app.UseHttpsRedirection();
-                app.UseDefaultFiles();
+
+                //UseFileServer instead of MapStaticAssets because React code is built separately
+                //and packaged at container image build time
+                app.UseFileServer();
 
                 app.UseAuthorization();
                 
@@ -53,12 +56,12 @@ namespace StockoApi
                     app.MapScalarApiReference();
                 }
                 
-                app.MapStaticAssets();
-                app.MapFallbackToFile("/index.html");
 
                 app.MapDatastoreEndpoints();
                 app.MapReportEndpoints();
-                
+
+                app.MapFallbackToFile("/index.html");
+
                 app.Run();
             }
             catch (Exception ex)
