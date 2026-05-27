@@ -44,8 +44,7 @@ COPY --from=build /src/stockoui/dist ./wwwroot
 WORKDIR /srv/stocko
 COPY --chown=$APP_UID:$APP_UID --chmod=0777 --from=publish /app/publish/cache ./cache
 
-ENV ASPNETCORE_HTTP_PORTS=8080
-ENV ASPNETCORE_HTTPS_PORTS=8081
+ENV ASPNETCORE_ENVIRONMENT=Production
 
 WORKDIR /app
 ENTRYPOINT ["dotnet", "StockoApi.dll"]

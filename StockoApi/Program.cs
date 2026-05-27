@@ -38,11 +38,16 @@ namespace StockoApi
                 builder.Services.AddScoped<IReportService, ReportService>();
 
                 var app = builder.Build();
-                                
+
                 app.UseSerilogRequestLogging();
 
-                // Configure the HTTP request pipeline.
-                app.UseHttpsRedirection();
+                if (app.Environment.IsDevelopment() is false)
+                {
+                    WarnOnNonDevMissingHttpsConfig(builder.Configuration);
+
+                    // Configure the HTTP request pipeline.
+                    app.UseHttpsRedirection();
+                }
 
                 //UseFileServer instead of MapStaticAssets because React code is built separately
                 //and packaged at container image build time
@@ -52,6 +57,7 @@ namespace StockoApi
                 
                 if (app.Environment.IsDevelopment())
                 {
+                    app.UseDeveloperExceptionPage();
                     app.MapOpenApi();
                     app.MapScalarApiReference();
                 }
@@ -70,6 +76,22 @@ namespace StockoApi
             finally
             {
                 Log.CloseAndFlush();
+            }
+        }
+
+        private static void WarnOnNonDevMissingHttpsConfig(ConfigurationManager config)
+        {
+            bool isConfigHttpsPorMissing = string.IsNullOrWhiteSpace(config["https_port"]);
+            bool isEnvAspNetHttpsPortMissing = string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ASPNETCORE_HTTPS_PORTS"));
+            bool isEnvAspNetHttpsUrlMissing = (Environment.GetEnvironmentVariable("ASPNETCORE_URLS") ?? string.Empty)
+                .Contains("https://", StringComparison.OrdinalIgnoreCase) is false;
+
+            bool isHttpsConfigMissing = isConfigHttpsPorMissing && isEnvAspNetHttpsPortMissing && isEnvAspNetHttpsUrlMissing;
+            if (isHttpsConfigMissing)
+            {
+                Log.Warning("HTTPS endpoint may not be not configured but environment is not development.");
+                Log.Warning("Please set the 'ASPNETCORE_HTTPS_PORTS' environment variable, along with trusted Kestrel certificates.");
+                Log.Warning("Alternatively, to use HTTP, set ASPNETCORE_ENVIRONMENT to 'Development'");
             }
         }
     }
