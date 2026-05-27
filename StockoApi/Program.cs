@@ -56,7 +56,6 @@ namespace StockoApi
                     app.MapScalarApiReference();
                 }
                 
-
                 app.MapDatastoreEndpoints();
                 app.MapReportEndpoints();
 
