@@ -25,19 +25,26 @@ RUN dotnet restore "./StockoApi/StockoApi.csproj"
 COPY . .
 WORKDIR "/src/StockoApi"
 RUN dotnet build "./StockoApi.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/stockoui"
+RUN npm install
+RUN npm run build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
+WORKDIR "/src/StockoApi"
 RUN dotnet publish "./StockoApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY --from=build /src/stockoui/dist ./wwwroot
 # Copy the published cache folder into /srv/stocko/cache and ensure the runtime can read/write it.
-RUN mkdir -p /srv/stocko \
- && if [ -d /app/cache ]; then cp -a /app/cache /srv/stocko/; fi \
- && chown -R $APP_UID:$APP_GID /srv/stocko/cache 2>/dev/null || true \
- && chmod -R 0777 /srv/stocko/cache
+WORKDIR /srv/stocko
+COPY --chown=$APP_UID:$APP_UID --chmod=0777 --from=publish /app/publish/cache ./cache
+
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+WORKDIR /app
 ENTRYPOINT ["dotnet", "StockoApi.dll"]
