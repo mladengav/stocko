@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using StockoApi.Application;
 using StockoApi.Infrastructure.Datastore.Options;
@@ -12,7 +11,10 @@ namespace StockoApi.Presentation.Filters
     /// On a hit it short-circuits the pipeline and returns the cached response; on a
     /// miss it invokes the endpoint and caches the result under <see cref="OverviewCacheKey"/>.
     /// </summary>
-    public sealed class DatastoreCacheEndpointFilter : IEndpointFilter
+    public sealed class DatastoreCacheEndpointFilter(
+        [FromKeyedServices(DatastoreCacheEndpointFilter.CacheServiceKey)] IMemoryCache cache,
+        IOptions<DatastoreOptions> options,
+        ILogger<DatastoreCacheEndpointFilter> logger) : IEndpointFilter
     {
         /// <summary>DI service key of the memory cache used by this filter.</summary>
         public const string CacheServiceKey = "DatastoreCache";
@@ -20,25 +22,13 @@ namespace StockoApi.Presentation.Filters
         /// <summary>Static cache key under which the full ticker overview is stored.</summary>
         public const string OverviewCacheKey = "alltickers";
 
-        private readonly IMemoryCache _cache;
-        private readonly DatastoreOptions _options;
-        private readonly ILogger<DatastoreCacheEndpointFilter> _logger;
-
-        public DatastoreCacheEndpointFilter(
-            [FromKeyedServices(CacheServiceKey)] IMemoryCache cache,
-            IOptions<DatastoreOptions> options,
-            ILogger<DatastoreCacheEndpointFilter> logger)
-        {
-            _cache = cache;
-            _options = options.Value;
-            _logger = logger;
-        }
+        private readonly DatastoreOptions _datastoreOptions = options.Value;
 
         public async ValueTask<object?> InvokeAsync(
             EndpointFilterInvocationContext context,
             EndpointFilterDelegate next)
         {
-            if (_cache.TryGetValue(OverviewCacheKey, out var cached))
+            if (cache.TryGetValue(OverviewCacheKey, out var cached))
             {
                 // Short-circuit: serve the cached response without invoking the endpoint.
                 return cached;
@@ -59,24 +49,29 @@ namespace StockoApi.Presentation.Filters
             }
 
             var size = ResolveSize(result);
-            if (size > _options.CacheMaxItemCount)
-            {
-                // The entry exceeds the cache's SizeLimit, so MemoryCache will reject it
-                // and every request will keep falling through to the datastore.
-                _logger.LogWarning(
-                    "Overview result of {RecordCount} records exceeds the cache cap of " +
-                    "{CacheMaxItemCount}; the response will not be cached.",
-                    size, _options.CacheMaxItemCount);
-            }
+            WarnOnCacheOverflow(size);
 
             var entryOptions = new MemoryCacheEntryOptions
             {
-                SlidingExpiration = TimeSpan.FromMinutes(_options.CacheSlidingExpirationMinutes),
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_options.CacheAbsoluteExpirationMinutes),
+                SlidingExpiration = TimeSpan.FromMinutes(_datastoreOptions.CacheSlidingExpirationMinutes),
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_datastoreOptions.CacheAbsoluteExpirationMinutes),
                 Size = size,
             };
 
-            _cache.Set(OverviewCacheKey, result, entryOptions);
+            cache.Set(OverviewCacheKey, result, entryOptions);
+        }
+
+        private void WarnOnCacheOverflow(long size)
+        {
+            if (size > _datastoreOptions.CacheMaxItemCount)
+            {
+                // The entry exceeds the cache's SizeLimit, so MemoryCache will reject it
+                // and every request will keep falling through to the datastore.
+                logger.LogWarning(
+                    "Overview result of {RecordCount} records exceeds the cache cap of " +
+                    "{CacheMaxItemCount}; the response will not be cached.",
+                    size, _datastoreOptions.CacheMaxItemCount);
+            }
         }
 
         // The cache SizeLimit counts overview records, so an entry's Size is the number

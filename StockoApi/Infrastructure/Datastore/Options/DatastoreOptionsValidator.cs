@@ -5,6 +5,7 @@ namespace StockoApi.Infrastructure.Datastore.Options
     /// <summary>
     /// Validates <see cref="DatastoreOptions"/> at application startup.
     /// </summary>
+    // TODO Convert to FluidValidation
     public sealed class DatastoreOptionsValidator
         : IValidateOptions<DatastoreOptions>
     {
