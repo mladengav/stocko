@@ -260,7 +260,7 @@ function ClientSideReportView() {
 
     useEffect(() => {
         if (reportPositions !== undefined && tickers === undefined) {
-            populateDatastoreData();
+            populateDatastoreData();  //TODO use TanStack Query to cache responses from back-end
         }
     }, [reportPositions, tickers]);
 

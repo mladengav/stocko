@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using StockoApi.Application;
 using StockoApi.Infrastructure.Datastore;
 using StockoApi.Infrastructure.Datastore.Options;
+using StockoApi.Presentation.Filters;
 using Serilog;
 
 namespace StockoApi.Presentation
@@ -23,6 +25,18 @@ namespace StockoApi.Presentation
                 .ValidateOnStart();
 
             services.AddSingleton<IValidateOptions<DatastoreOptions>, DatastoreOptionsValidator>();
+
+            // Keyed memory cache as datastore overview is not expected to change frequently
+            services.AddKeyedSingleton<IMemoryCache>(
+                DatastoreCacheEndpointFilter.CacheServiceKey,
+                (sp, _) =>
+                {
+                    var opts = sp.GetRequiredService<IOptions<DatastoreOptions>>().Value;
+                    return new MemoryCache(new MemoryCacheOptions
+                    {
+                        SizeLimit = opts.CacheMaxItemCount,
+                    });
+                });
 
             //create the Datastore based on the options
             services.AddSingleton<IDatastoreService>(sp =>

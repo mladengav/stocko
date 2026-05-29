@@ -1,4 +1,5 @@
 ﻿using StockoApi.Application;
+using StockoApi.Presentation.Filters;
 
 namespace StockoApi.Presentation
 {
@@ -14,6 +15,7 @@ namespace StockoApi.Presentation
 
                 return TypedResults.Json(tickers, statusCode: StatusCodes.Status200OK);
             })
+            .AddEndpointFilter<DatastoreCacheEndpointFilter>()
             .WithName("GetOverview")
             .WithDescription("Get overview of available tickers in the data store");
         }
