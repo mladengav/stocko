@@ -28,6 +28,26 @@ namespace StockoApi.Infrastructure.Datastore.Options
         /// </summary>
         public string CsvCacheFolder { get; set; } = "cache";
 
+        // ── In-memory overview cache ──────────────────────────────────────────
+
+        /// <summary>
+        /// Sliding expiration, in minutes, for the cached ticker overview list.
+        /// The entry is evicted if it is not read within this window.
+        /// </summary>
+        public int CacheSlidingExpirationMinutes { get; set; } = 5;
+
+        /// <summary>
+        /// Absolute expiration, in minutes, for the cached ticker overview list.
+        /// The entry is always evicted once this window elapses, regardless of reads.
+        /// </summary>
+        public int CacheAbsoluteExpirationMinutes { get; set; } = 10;
+
+        /// <summary>
+        /// Maximum number of overview records the cache may hold. Used as the
+        /// <c>SizeLimit</c> of the "DatastoreCache" memory cache.
+        /// </summary>
+        public long CacheMaxItemCount { get; set; } = 10_000;
+
         // ── Azure Blob Storage ────────────────────────────────────────────────
         // Required when DatastoreType is AzureBlobCsv.
 

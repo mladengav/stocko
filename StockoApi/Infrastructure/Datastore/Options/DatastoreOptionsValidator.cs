@@ -21,6 +21,8 @@ namespace StockoApi.Infrastructure.Datastore.Options
 
             ValidateCsvCacheFolder(options, errors);
 
+            ValidateCacheOptions(options, errors);
+
             if (options.DatastoreType == DatastoreType.AzureBlobCsv)
             {
                 ValidateAzureOptions(options, errors);
@@ -54,6 +56,39 @@ namespace StockoApi.Infrastructure.Datastore.Options
                 errors.Add(
                     $"{nameof(options.CsvCacheFolder)} '{options.CsvCacheFolder}' " +
                     $"is not a valid file-system path: {ex.Message}");
+            }
+        }
+
+        private static void ValidateCacheOptions(
+            DatastoreOptions options, List<string> errors)
+        {
+            if (options.CacheSlidingExpirationMinutes <= 0)
+            {
+                errors.Add(
+                    $"{nameof(options.CacheSlidingExpirationMinutes)} must be greater than zero.");
+            }
+
+            if (options.CacheAbsoluteExpirationMinutes <= 0)
+            {
+                errors.Add(
+                    $"{nameof(options.CacheAbsoluteExpirationMinutes)} must be greater than zero.");
+            }
+
+            if (options.CacheSlidingExpirationMinutes > 0
+                && options.CacheAbsoluteExpirationMinutes > 0
+                && options.CacheAbsoluteExpirationMinutes < options.CacheSlidingExpirationMinutes)
+            {
+                errors.Add(
+                    $"{nameof(options.CacheAbsoluteExpirationMinutes)} " +
+                    $"({options.CacheAbsoluteExpirationMinutes}) must be greater than or equal to " +
+                    $"{nameof(options.CacheSlidingExpirationMinutes)} " +
+                    $"({options.CacheSlidingExpirationMinutes}).");
+            }
+
+            if (options.CacheMaxItemCount <= 0)
+            {
+                errors.Add(
+                    $"{nameof(options.CacheMaxItemCount)} must be greater than zero.");
             }
         }
 
