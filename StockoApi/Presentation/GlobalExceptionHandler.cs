@@ -28,12 +28,8 @@ namespace StockoApi.Presentation
                 Status = statusCode,
                 Title = title,
                 Type = GetProblemType(statusCode),
-                Instance = httpContext.Request.Path,
                 Detail = GetSafeErrorMessage(exception, httpContext)
             };
-
-            problemDetails.Extensions["traceId"] = httpContext.TraceIdentifier;
-            problemDetails.Extensions["timestamp"] = DateTime.UtcNow;
 
             return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
             {
@@ -45,7 +41,6 @@ namespace StockoApi.Presentation
         private static (int StatusCode, string Title) MapException(Exception exception) => exception switch
         {
             ArgumentNullException => (StatusCodes.Status400BadRequest, "Invalid argument provided"),
-            ArgumentException => (StatusCodes.Status400BadRequest, "Invalid argument provided"),
             UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
             _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred")
         };
@@ -62,14 +57,8 @@ namespace StockoApi.Presentation
 
         private static string? GetSafeErrorMessage(Exception exception, HttpContext context)
         {
-            // Only expose details in development
-            var env = context.RequestServices.GetRequiredService<IHostEnvironment>();
-            if (env.IsDevelopment())
-            {
-                return exception.Message;
-            }
-
-            return null;
+            // TODO add sanitized error messages for app-specific exceptions
+            return "Application error occurred";
         }
     }
 }

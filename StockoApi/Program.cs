@@ -51,8 +51,14 @@ namespace StockoApi
 
                 app.UseSerilogRequestLogging();
 
-                if (app.Environment.IsDevelopment() is false)
+                if (app.Environment.IsDevelopment())
                 {
+                    app.UseDeveloperExceptionPage();
+                }
+                else
+                {
+                    app.UseExceptionHandler();
+
                     WarnOnNonDevMissingHttpsConfig(builder.Configuration);
 
                     // Configure the HTTP request pipeline.
@@ -70,10 +76,6 @@ namespace StockoApi
                     app.UseDeveloperExceptionPage();
                     app.MapOpenApi();
                     app.MapScalarApiReference();
-                }
-                else
-                {
-                    app.UseExceptionHandler();
                 }
                 
                 app.MapDatastoreEndpoints();
