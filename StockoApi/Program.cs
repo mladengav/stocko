@@ -23,7 +23,17 @@ namespace StockoApi
                     .ReadFrom.Configuration(builder.Configuration)
                     .ReadFrom.Services(services));
 
-                //TODO:  Add ProblemDetails and GlobalExceptionHandler
+                builder.Services.AddProblemDetails(options =>
+                {
+                    options.CustomizeProblemDetails = ctx =>
+                    {
+                        ctx.ProblemDetails.Extensions["traceId"] = ctx.HttpContext.TraceIdentifier;
+                        ctx.ProblemDetails.Extensions["timestamp"] = DateTime.UtcNow;
+                        ctx.ProblemDetails.Instance = $"{ctx.HttpContext.Request.Method} {ctx.HttpContext.Request.Path}";
+                    };
+                });
+
+                builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
                 // Add services to the container.
                 builder.Services.AddAuthorization();
@@ -60,6 +70,10 @@ namespace StockoApi
                     app.UseDeveloperExceptionPage();
                     app.MapOpenApi();
                     app.MapScalarApiReference();
+                }
+                else
+                {
+                    app.UseExceptionHandler();
                 }
                 
                 app.MapDatastoreEndpoints();
