@@ -4,8 +4,9 @@ import HomeView from './views/HomeView';
 import DatastoreView from './views/DatastoreView';
 import ReportView from './views/ReportView';
 import ClientSideReportView from './views/ClientSideReportView';
+import AboutView from './views/AboutView';
 
-type View = 'home' | 'datastore' | 'report' | 'clientSideReport';
+export type View = 'home' | 'datastore' | 'report' | 'clientSideReport' | 'about';
 
 function App() {
     const [view, setView] = useState<View>('home');
@@ -37,13 +38,20 @@ function App() {
                 >
                     Report
                 </button>
+                <button
+                    className={view === 'about' ? 'active' : ''}
+                    onClick={() => setView('about')}
+                >
+                    About
+                </button>
             </nav>
             <main className="app-content">
-                {view === 'home' && <HomeView />}
+                {view === 'home' && <HomeView onNavigate={setView} />}
                 {view === 'datastore' && <DatastoreView />}
                 {view === 'clientSideReport' && <ClientSideReportView />}
                 {view === 'report' && <ReportView />}
-                
+                {view === 'about' && <AboutView onNavigate={setView} />}
+
             </main>
         </div>
     );
