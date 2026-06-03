@@ -1,10 +1,10 @@
 name: StockoApi Tests
 
-# Run the StockoApi.Tests suite for pull requests that target main or repo default branch
+# Run the StockoApi.Tests suite for pull requests that target the main branch
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
-    branches: [default, main]
+    branches: [main]
     paths:
       - 'StockoApi/**'
       - 'StockoApi.Tests/**'
