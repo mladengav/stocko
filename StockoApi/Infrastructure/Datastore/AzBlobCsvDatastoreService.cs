@@ -1,4 +1,3 @@
-using Azure.Core;
 using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -34,19 +33,21 @@ namespace StockoApi.Infrastructure.Datastore
             IOptions<DatastoreOptions> options,
             IConfiguration config,
             ILogger<AzBlobCsvDatastoreService> logger)
+            : this(CreateBlobServiceClient(options.Value), options, config, logger)
+        {
+        }
+
+        internal AzBlobCsvDatastoreService(
+            BlobServiceClient blobServiceClient,
+            IOptions<DatastoreOptions> options,
+            IConfiguration config,
+            ILogger<AzBlobCsvDatastoreService> logger)
             : base(options)
         {
             _logger = logger;
             Directory.CreateDirectory(CacheFolder);
 
-            var datastoreOptions = options.Value;
-
-            // AzureStorageBlobUrl is guaranteed non-null/non-whitespace here because
-            // StockoDatastoreOptionsValidator rejects AzureBlobCsv configs without it.
-            var storageUrl = datastoreOptions.AzureStorageBlobUrl!;
-
-            _container = new BlobServiceClient(new Uri(storageUrl), BuildCredential(datastoreOptions))
-                .GetBlobContainerClient(ContainerName);
+            _container = blobServiceClient.GetBlobContainerClient(ContainerName);
 
             // Kick off the initial sync as a background task so DI construction stays fast.
             // GetOverviewAsync awaits this task on every call, but it's a cheap check once complete.
@@ -67,10 +68,18 @@ namespace StockoApi.Infrastructure.Datastore
             return await base.GetOverviewAsync();
         }
 
+        private static BlobServiceClient CreateBlobServiceClient(DatastoreOptions options)
+        {
+            // AzureStorageBlobUrl is guaranteed non-null/non-whitespace here because
+            // StockoDatastoreOptionsValidator rejects AzureBlobCsv configs without it.
+            var storageUrl = options.AzureStorageBlobUrl!;
+            return new BlobServiceClient(new Uri(storageUrl), BuildCredential(options));
+        }
+
         /// <summary>
-        /// Builds an Azure <see cref="TokenCredential"/> from the supplied options.
+        /// Builds an Azure <see cref="ClientSecretCredential"/> from the supplied options.
         /// </summary>
-        private static TokenCredential BuildCredential(DatastoreOptions options)
+        private static ClientSecretCredential BuildCredential(DatastoreOptions options)
         {
             //options have been validated on init, non-null and non-empty
             return new ClientSecretCredential(

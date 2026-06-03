@@ -1,0 +1,40 @@
+name: StockoApi Tests
+
+# Run the StockoApi.Tests suite for pull requests that target the main branch
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+    paths:
+      - 'StockoApi/**'
+      - 'StockoApi.Tests/**'
+
+# Cancel an in-progress run for a PR when new commits are pushes
+concurrency:
+  group: stockoapi-tests-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Run StockoApi.Tests
+    # Only run for non-draft PRs. A draft converted to "Ready for review"
+    # fires the ready_for_review event and passes this guard.
+    if: ${{ !github.event.pull_request.draft }}
+    # ubuntu-latest ships with Docker, which the Azurite-based tests require
+    # via Testcontainers.
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore StockoApi.Tests/StockoApi.Tests.csproj
+
+      - name: Test
+        run: dotnet test StockoApi.Tests/StockoApi.Tests.csproj --no-restore --verbosity normal

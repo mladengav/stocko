@@ -2,7 +2,7 @@
   <Project Path="StockoApi/StockoApi.csproj">
     <BuildDependency Project="stockoui/stockoui.esproj" />
   </Project>
-  <Project Path="StockoApiTests/StockoApiTests.csproj" Id="4bca43c2-ed17-47d8-a3a3-ea52a2aa7c7e" />
+  <Project Path="StockoApi.Tests/StockoApi.Tests.csproj" Id="4bca43c2-ed17-47d8-a3a3-ea52a2aa7c7e" />
   <Project Path="stockoui/stockoui.esproj">
     <Build />
     <Deploy />
