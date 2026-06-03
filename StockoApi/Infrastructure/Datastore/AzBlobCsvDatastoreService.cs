@@ -1,4 +1,3 @@
-using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Options;
@@ -30,14 +29,6 @@ namespace StockoApi.Infrastructure.Datastore
         private bool _disposed;
 
         public AzBlobCsvDatastoreService(
-            IOptions<DatastoreOptions> options,
-            IConfiguration config,
-            ILogger<AzBlobCsvDatastoreService> logger)
-            : this(CreateBlobServiceClient(options.Value), options, config, logger)
-        {
-        }
-
-        internal AzBlobCsvDatastoreService(
             BlobServiceClient blobServiceClient,
             IOptions<DatastoreOptions> options,
             IConfiguration config,
@@ -49,9 +40,8 @@ namespace StockoApi.Infrastructure.Datastore
 
             _container = blobServiceClient.GetBlobContainerClient(ContainerName);
 
-            // Kick off the initial sync as a background task so DI construction stays fast.
-            // GetOverviewAsync awaits this task on every call, but it's a cheap check once complete.
-            // The initial sync ignores local timestamps and overwrites every blob, so the cache
+            // Start initial sync as a background task so DI construction stays fast.
+            // Initial sync ignores local timestamps and overwrites every blob, so the cache
             // always starts from a known-good copy of Azure.
             _initialSyncTask = Task.Run(() => SafeSyncAsync(_shutdownCts.Token, "initial sync", forceAll: true));
 
@@ -65,27 +55,19 @@ namespace StockoApi.Infrastructure.Datastore
             {
                 await _initialSyncTask;
             }
-            return await base.GetOverviewAsync();
-        }
 
-        private static BlobServiceClient CreateBlobServiceClient(DatastoreOptions options)
-        {
-            // AzureStorageBlobUrl is guaranteed non-null/non-whitespace here because
-            // StockoDatastoreOptionsValidator rejects AzureBlobCsv configs without it.
-            var storageUrl = options.AzureStorageBlobUrl!;
-            return new BlobServiceClient(new Uri(storageUrl), BuildCredential(options));
-        }
-
-        /// <summary>
-        /// Builds an Azure <see cref="ClientSecretCredential"/> from the supplied options.
-        /// </summary>
-        private static ClientSecretCredential BuildCredential(DatastoreOptions options)
-        {
-            //options have been validated on init, non-null and non-empty
-            return new ClientSecretCredential(
-                options.AzureTenantId,
-                options.AzureClientId,
-                options.AzureClientSecret);
+            // Serialize the read against the background sync to prevent a refresh from replacing a CSV mid-read
+            // and guarantees that multiple files that make up one overview come from a
+            // single, consistent sync generation
+            await _syncLock.WaitAsync(_shutdownCts.Token);
+            try
+            {
+                return await base.GetOverviewAsync();
+            }
+            finally
+            {
+                _syncLock.Release();
+            }
         }
 
         private static int ResolveRefreshSeconds(IConfiguration config)
@@ -162,11 +144,11 @@ namespace StockoApi.Infrastructure.Datastore
             }
 
             var remoteUtc = blob.Properties.LastModified?.UtcDateTime;
-            if (!forceAll && File.Exists(targetPath) && remoteUtc is { } rUtc)
+            if (!forceAll && File.Exists(targetPath) && remoteUtc.HasValue)
             {
                 // We pin local LastWriteTimeUtc to the blob's LastModified after each
                 // download, so this comparison is stable across restarts.
-                if (File.GetLastWriteTimeUtc(targetPath) >= rUtc)
+                if (File.GetLastWriteTimeUtc(targetPath) >= remoteUtc.Value)
                 {
                     return;
                 }
@@ -182,9 +164,9 @@ namespace StockoApi.Infrastructure.Datastore
                     await blobClient.DownloadToAsync(output, ct);
                 }
 
-                if (remoteUtc is { } rUtc2)
+                if (remoteUtc.HasValue)
                 {
-                    File.SetLastWriteTimeUtc(tempPath, rUtc2);
+                    File.SetLastWriteTimeUtc(tempPath, remoteUtc.Value);
                 }
 
                 File.Move(tempPath, targetPath, overwrite: true);
