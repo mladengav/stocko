@@ -1,0 +1,3 @@
+# Code owners for stocko.
+# Every change requires review from @mladengav (enforced by the "main" branch ruleset).
+* @mladengav
