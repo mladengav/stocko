@@ -1,7 +1,7 @@
 # Stocko
 
-Stocko is a dividend-stock analysis app. It surfaces dividend history, per-ticker
-overviews, and position reports computed from CSV data.
+Stocko is a dividend-stock analysis app. It displays dividend history, calculated historical
+and predictive indicators, per-ticker overviews, and position reports computed from CSV data.
 
 ## Overview
 
@@ -10,7 +10,7 @@ Docker image:
 
 - **Back end** — a .NET 10 ASP.NET Core Minimal API (`StockoApi/`) following Clean
   Architecture. It exposes the JSON API and serves the front-end static assets.
-- **Front end** — a Vite + React 19 + TypeScript single-page app (`stockoui/`) using MUI.
+- **Front end** — React 19 + TypeScript (Vite for development) single-page app (`stockoui/`) using MUI.
   At image build time the production `dist/` bundle is copied into the API's `wwwroot`,
   so one container serves both the API and the UI.
 - **Datastore** — the data layer reads CSV files (tickers, dividend history, precomputed
