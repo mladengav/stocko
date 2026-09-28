@@ -19,10 +19,10 @@ import {
     getDefaultMrtTableOptions,
     leftAlignedCellProps,
     symbolBodyCellProps,
-    TableColumnLegend,
     tickerDataHeaderCellProps,
     tickerDataHeaderShade,
 } from '../lib/mrtTableStyle';
+import { TableColumnLegend } from '../components/TableColumnLegend';
 import type { TickerOverview } from './types';
 
 function DatastoreTable({ tickers }: { tickers: TickerOverview[] }) {

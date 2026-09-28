@@ -21,10 +21,10 @@ import {
     portfolioTotalsHeaderCellProps,
     portfolioTotalsHeaderShade,
     symbolBodyCellProps,
-    TableColumnLegend,
     tickerDataHeaderCellProps,
     tickerDataHeaderShade,
 } from '../lib/mrtTableStyle';
+import { TableColumnLegend } from '../components/TableColumnLegend';
 import PortfolioAllocations from './PortfolioAllocations';
 import ReportInput from './ReportInput';
 import type { Position, ReportRow, TickerOverview } from './types';
