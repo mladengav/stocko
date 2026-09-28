@@ -1,0 +1,8 @@
+<Project>
+  <!-- Shared settings for C# projects only; stockoui.esproj also imports this file. -->
+  <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.csproj'">
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+</Project>
