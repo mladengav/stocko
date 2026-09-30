@@ -1,7 +1,6 @@
 using Scalar.AspNetCore;
 using Serilog;
-using StockoApi.Application;
-using StockoApi.Infrastructure.Report;
+using StockoApi.Application.Report;
 using StockoApi.Presentation;
 
 namespace StockoApi

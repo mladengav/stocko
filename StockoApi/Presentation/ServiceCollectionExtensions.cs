@@ -3,7 +3,7 @@ using Azure.Storage.Blobs;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using StockoApi.Application;
+using StockoApi.Application.Datastore;
 using StockoApi.Infrastructure.Datastore;
 using StockoApi.Infrastructure.Datastore.Options;
 using StockoApi.Presentation.Filters;
