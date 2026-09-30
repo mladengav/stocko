@@ -3,7 +3,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using StockoApi.Application;
+using StockoApi.Domain;
 using StockoApi.Infrastructure.Datastore;
 using StockoApi.Infrastructure.Datastore.Options;
 using Testcontainers.Azurite;
@@ -80,15 +80,13 @@ namespace StockoApi.Tests.Infrastructure.Datastore
 
         [Theory]
         [MemberData(nameof(DatastoreTestData.ExpectedSymbolTickers), MemberType = typeof(DatastoreTestData))]
-        public async Task Deserialize_RecordWithAllFields_ReturnsCorrectProperties(string symbol, TickerOverviewRecord expectedRecord)
+        public async Task Deserialize_RecordWithAllFields_ReturnsCorrectProperties(string symbol, TickerSnapshot expectedRecord)
         {
             using var testDatastore = CreateService();
 
             var tickers = await testDatastore.GetOverviewAsync();
 
-            var record = tickers.SingleOrDefault(t => t.Symbol == symbol);
-
-            Assert.NotNull(record);
+            var record = tickers.Single(t => t.Symbol == symbol);
 
             record.Should().BeEquivalentTo(expectedRecord);
         }
@@ -102,9 +100,7 @@ namespace StockoApi.Tests.Infrastructure.Datastore
 
             //CU is missing the ExDividendDate, DividendRate, and DividendYield fields in the test CSV,
             //but the rest of the fields should deserialize correctly.
-            var record = tickers.SingleOrDefault(t => t.Symbol == "CU.TO");
-
-            Assert.NotNull(record);
+            var record = tickers.Single(t => t.Symbol == "CU.TO");
 
             //verify explicit properties that should be missing
             Assert.Equal("CU.TO", record.Symbol);

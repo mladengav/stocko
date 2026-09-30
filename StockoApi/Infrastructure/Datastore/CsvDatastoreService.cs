@@ -3,7 +3,8 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
 using Microsoft.Extensions.Options;
-using StockoApi.Application;
+using StockoApi.Application.Datastore;
+using StockoApi.Domain;
 using StockoApi.Infrastructure.Datastore.Options;
 
 namespace StockoApi.Infrastructure.Datastore
@@ -31,7 +32,7 @@ namespace StockoApi.Infrastructure.Datastore
         {
         }
 
-        public virtual async Task<IEnumerable<TickerOverviewRecord>> GetOverviewAsync()
+        public virtual async Task<IEnumerable<TickerSnapshot>> GetOverviewAsync()
         {
             var aggregationsDir = Path.Combine(_cacheFolder, AggregationsSubdir);
             var ttmBySymbol = await ReadTtmDividendsAsync(
@@ -151,14 +152,14 @@ namespace StockoApi.Infrastructure.Datastore
             return result;
         }
 
-        private static async Task<List<TickerOverviewRecord>> ReadTickersAsync(
+        private static async Task<List<TickerSnapshot>> ReadTickersAsync(
             string path,
             IReadOnlyDictionary<string, decimal> ttmBySymbol,
             IReadOnlyDictionary<string, DateOnly> lastDecreaseBySymbol,
             IReadOnlyDictionary<string, int> yearsSinceDecreaseBySymbol,
             IReadOnlyDictionary<string, int> consecutiveIncreaseBySymbol)
         {
-            var records = new List<TickerOverviewRecord>();
+            var records = new List<TickerSnapshot>();
             if (!File.Exists(path))
             {
                 return records;
@@ -190,30 +191,30 @@ namespace StockoApi.Infrastructure.Datastore
                     ? yci
                     : 0;
 
-                records.Add(new TickerOverviewRecord(
-                    SnapshotDate: row.SnapshotDate,
-                    Symbol: row.Symbol,
-                    SectorKey: row.SectorKey ?? string.Empty,
-                    IndustryKey: row.IndustryKey ?? string.Empty,
-                    Industry: row.Industry ?? string.Empty,
-                    Sector: row.Sector ?? string.Empty,
-                    ExDividendDate: row.ExDividendDate,
-                    LastDividendDate: row.LastDividendDate,
-                    LongName: row.LongName ?? string.Empty,
-                    RegularMarketPrice: row.RegularMarketPrice,
-                    RegularMarketTime: row.RegularMarketTime,
-                    DividendRate: row.DividendRate,
-                    DividendYield: row.DividendYield,
-                    MarketCap: row.MarketCap,
-                    PayoutRatio: row.PayoutRatio,
-                    HeldPercentInsiders: row.HeldPercentInsiders,
-                    HeldPercentInstitutions: row.HeldPercentInstitutions,
-                    QuoteType: row.QuoteType ?? string.Empty,
-                    TypeDisp: row.TypeDisp ?? string.Empty,
-                    TtmDivs: ttm,
-                    LastDividendDecrease: lastDecrease,
-                    YearsSinceDividendDecrease: yearsSinceDecrease,
-                    YearsConsecutiveDividendIncrease: consecutiveIncrease));
+                records.Add(new TickerSnapshot {
+                    SnapshotDate = row.SnapshotDate,
+                    Symbol = row.Symbol,
+                    SectorKey = row.SectorKey ?? string.Empty,
+                    IndustryKey = row.IndustryKey ?? string.Empty,
+                    Industry = row.Industry ?? string.Empty,
+                    Sector = row.Sector ?? string.Empty,
+                    ExDividendDate = row.ExDividendDate,
+                    LastDividendDate = row.LastDividendDate,
+                    LongName = row.LongName ?? string.Empty,
+                    RegularMarketPrice = row.RegularMarketPrice,
+                    RegularMarketTime = row.RegularMarketTime,
+                    DividendRate = row.DividendRate,
+                    DividendYield = row.DividendYield,
+                    MarketCap = row.MarketCap,
+                    PayoutRatio = row.PayoutRatio,
+                    HeldPercentInsiders = row.HeldPercentInsiders,
+                    HeldPercentInstitutions = row.HeldPercentInstitutions,
+                    QuoteType = row.QuoteType ?? string.Empty,
+                    TypeDisp = row.TypeDisp ?? string.Empty,
+                    TtmDivs = ttm,
+                    LastDividendDecrease = lastDecrease,
+                    YearsSinceDividendDecrease = yearsSinceDecrease,
+                    YearsConsecutiveDividendIncrease = consecutiveIncrease });
             }
 
             return records;
@@ -256,7 +257,7 @@ namespace StockoApi.Infrastructure.Datastore
             public string? IndustryKey { get; set; }
             public string? Industry { get; set; }
             public string? Sector { get; set; }
-            public DateOnly ExDividendDate { get; set; }
+            public DateOnly? ExDividendDate { get; set; }
             public DateOnly LastDividendDate { get; set; }
             public string? LongName { get; set; }
             public decimal RegularMarketPrice { get; set; }
@@ -281,9 +282,7 @@ namespace StockoApi.Infrastructure.Datastore
                 Map(r => r.IndustryKey).Default(string.Empty);
                 Map(r => r.Industry).Default(string.Empty);
                 Map(r => r.Sector).Default(string.Empty);
-                Map(r => r.ExDividendDate)
-                    .TypeConverter<EpochOrDateOnlyConverter>()
-                    .Default(default(DateOnly));
+                Map(r => r.ExDividendDate).TypeConverter<EpochOrDateOnlyConverter>();
                 Map(r => r.LastDividendDate)
                     .TypeConverter<EpochOrDateOnlyConverter>()
                     .Default(default(DateOnly));
@@ -374,9 +373,10 @@ namespace StockoApi.Infrastructure.Datastore
         {
             public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
             {
+                object? fallback = memberMapData.IsDefaultSet ? memberMapData.Default : null;
                 if (string.IsNullOrWhiteSpace(text))
                 {
-                    return default(DateOnly);
+                    return fallback;
                 }
 
                 var trimmed = text.Trim();
@@ -390,7 +390,7 @@ namespace StockoApi.Infrastructure.Datastore
                     return DateOnly.FromDateTime(DateTimeOffset.FromUnixTimeSeconds(unix).UtcDateTime);
                 }
 
-                return default(DateOnly);
+                return fallback;
             }
         }
     }

@@ -1,11 +1,11 @@
-export interface TickerOverview {
+export interface TickerSnapshot {
     snapshotDate: string;
     symbol: string;
     sectorKey: string;
     industryKey: string;
     industry: string;
     sector: string;
-    exDividendDate: string;
+    exDividendDate: string | null;
     lastDividendDate: string;
     longName: string;
     regularMarketPrice: number;
@@ -30,14 +30,14 @@ export interface Position {
 }
 
 export interface ReportRow {
-    ticker: TickerOverview;
+    ticker: TickerSnapshot;
     quantity: number;
     positionValue: number;
     positionFwdDividend: number;
     positionTtmDividend: number;
 }
 
-export interface PositionOverview {
+export interface PositionSnapshot {
     position: Position;
     ttmDivs: number;
 }

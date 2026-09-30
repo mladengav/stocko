@@ -27,7 +27,7 @@ import {
 import { TableColumnLegend } from '../components/TableColumnLegend';
 import PortfolioAllocations from './PortfolioAllocations';
 import ReportInput from './ReportInput';
-import type { Position, ReportRow, TickerOverview } from './types';
+import type { Position, ReportRow, TickerSnapshot } from './types';
 
 function ClientSideReportTable({ rows }: { rows: ReportRow[] }) {
     const columns = useMemo<MRT_ColumnDef<ReportRow>[]>(
@@ -256,7 +256,7 @@ function ClientSideReportTable({ rows }: { rows: ReportRow[] }) {
 
 function ClientSideReportView() {
     const [reportPositions, setReportPositions] = useState<Position[]>();
-    const [tickers, setTickers] = useState<TickerOverview[]>();
+    const [tickers, setTickers] = useState<TickerSnapshot[]>();
 
     useEffect(() => {
         if (reportPositions !== undefined && tickers === undefined) {

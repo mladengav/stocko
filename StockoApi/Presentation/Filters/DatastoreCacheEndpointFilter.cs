@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using StockoApi.Application;
+using StockoApi.Domain;
 using StockoApi.Infrastructure.Datastore.Options;
 
 namespace StockoApi.Presentation.Filters
@@ -78,7 +78,7 @@ namespace StockoApi.Presentation.Filters
         // of rows it holds (falling back to 1 when the count can't be determined).
         private static long ResolveSize(object result)
         {
-            if (result is IValueHttpResult { Value: IEnumerable<TickerOverviewRecord> records })
+            if (result is IValueHttpResult { Value: IEnumerable<TickerSnapshot> records })
             {
                 return records.Count();
             }

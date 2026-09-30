@@ -1,4 +1,5 @@
-﻿using StockoApi.Application;
+﻿using StockoApi.Application.Report;
+using StockoApi.Domain;
 
 namespace StockoApi.Presentation
 {
@@ -10,9 +11,9 @@ namespace StockoApi.Presentation
 
             reporting.MapPost("aggregate-positions", async (List<Position> positions, IReportService reportService) =>
             {
-                var aggregatedPositions = await reportService.CreatePositionReportAsync(positions).ToListAsync();
+                var aggregatedPositionsStream = reportService.CreatePositionReportAsync(positions);
 
-                return TypedResults.Json(aggregatedPositions, statusCode: StatusCodes.Status200OK);
+                return TypedResults.Ok(aggregatedPositionsStream);
             })
             .WithName("AggregatePositions")
             .WithDescription("Create a report of positions with aggregated data based on the given quantities");

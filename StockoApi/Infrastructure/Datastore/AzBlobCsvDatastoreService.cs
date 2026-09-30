@@ -1,7 +1,7 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Options;
-using StockoApi.Application;
+using StockoApi.Domain;
 using StockoApi.Infrastructure.Datastore.Options;
 
 namespace StockoApi.Infrastructure.Datastore
@@ -49,7 +49,7 @@ namespace StockoApi.Infrastructure.Datastore
             _refreshLoopTask = RunRefreshLoopAsync(interval, _shutdownCts.Token);
         }
 
-        public override async Task<IEnumerable<TickerOverviewRecord>> GetOverviewAsync()
+        public override async Task<IEnumerable<TickerSnapshot>> GetOverviewAsync()
         {
             if (!_initialSyncTask.IsCompleted)
             {
