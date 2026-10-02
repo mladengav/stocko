@@ -20,13 +20,27 @@ namespace StockoApi.Infrastructure.Datastore.Options
                             Enum.GetNames<DatastoreType>()
                             .Where(typeName => typeName != DatastoreType.None.ToString()))}.");
 
-            ValidateCsvCacheFolder(options, errors);
-
             ValidateCacheOptions(options, errors);
 
-            if (options.DatastoreType == DatastoreType.AzureBlobCsv)
+            switch (options.DatastoreType)
             {
-                ValidateAzureOptions(options, errors);
+                case DatastoreType.Csv:
+                    ValidateCsvCacheFolder(options, errors);
+                    break;
+                case DatastoreType.AzureBlobCsv:
+                    ValidateCsvCacheFolder(options, errors);
+                    ValidateAzureOptions(options, errors);
+                    break;
+                case DatastoreType.MsSql:
+                    ValidateMsSqlOptions(options, errors);
+                    break;
+                default:
+                    errors.Add(
+                        $"Unsupported DatastoreType '{options.DatastoreType}'. " +
+                        $"Expected one of: {string.Join(", ",
+                            Enum.GetNames<DatastoreType>()
+                            .Where(typeName => typeName != DatastoreType.None.ToString()))}.");
+                    break;
             }
 
             return errors.Count == 0
@@ -107,6 +121,13 @@ namespace StockoApi.Infrastructure.Datastore.Options
 
             RequireNonWhiteSpace(options.AzureClientSecret,
                 nameof(options.AzureClientSecret), errors);
+        }
+
+        private static void ValidateMsSqlOptions(
+            DatastoreOptions options, List<string> errors)
+        {
+            RequireNonWhiteSpace(options.MsSqlConnectionString, //TODO Maybe more specific connection string validation?
+                nameof(options.MsSqlConnectionString), errors);
         }
 
         private static void RequireNonWhiteSpace(

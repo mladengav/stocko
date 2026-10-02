@@ -6,6 +6,7 @@ namespace StockoApi.Infrastructure.Datastore.Options
         None = 0,
         Csv,
         AzureBlobCsv,
+        MsSql,
     }
 
     /// <summary>
@@ -65,5 +66,13 @@ namespace StockoApi.Infrastructure.Datastore.Options
 
         /// <summary>Service-principal client secret.</summary>
         public string? AzureClientSecret { get; set; }
+
+        // ── MS SQL Storage ────────────────────────────────────────────────
+        // Required when DatastoreType is MsSql.
+
+        /// <summary>
+        /// Connection string for the MS SQL database.
+        /// </summary>
+        public string? MsSqlConnectionString { get; set; }
     }
 }

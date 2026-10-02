@@ -1,13 +1,15 @@
 ﻿using Azure.Identity;
 using Azure.Storage.Blobs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using Serilog;
 using StockoApi.Application.Datastore;
 using StockoApi.Infrastructure.Datastore;
 using StockoApi.Infrastructure.Datastore.Options;
 using StockoApi.Presentation.Filters;
-using Serilog;
+using StockoApi.Infrastructure.Datastore.EF;
 
 namespace StockoApi.Presentation
 {
@@ -56,6 +58,9 @@ namespace StockoApi.Presentation
                 case DatastoreType.Csv:
                     services.AddCsvDatastore();
                     break;
+                case DatastoreType.MsSql:
+                    services.AddMsSqlDatastore();
+                    break;
                 default:
                     throw new InvalidOperationException($"Unsupported DatastoreType '{datastoreOptions.DatastoreType}'. ");
             }
@@ -100,6 +105,22 @@ namespace StockoApi.Presentation
             {
                 var datastore = ActivatorUtilities.CreateInstance<CsvDatastoreService>(sp);
                 Log.Logger.Information("Activated datastore type:  {DatastoreType}", DatastoreType.Csv);
+                return datastore;
+            });
+        }
+
+        private static IServiceCollection AddMsSqlDatastore(this IServiceCollection services)
+        {
+            services.AddDbContext<StockoDbContext>((sp, options) =>
+            {
+                var opts = sp.GetRequiredService<IOptions<DatastoreOptions>>().Value;
+                options.UseSqlServer(opts.MsSqlConnectionString!);
+            }, contextLifetime: ServiceLifetime.Singleton); //TODO Use DbContextFactory if DB updates or transactions are needed
+
+            return services.AddSingleton<IDatastoreService>(sp =>
+            {
+                var datastore = ActivatorUtilities.CreateInstance<EfDatastoreService>(sp);
+                Log.Logger.Information("Activated datastore type:  {DatastoreType}", DatastoreType.MsSql);
                 return datastore;
             });
         }
